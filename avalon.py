@@ -7,12 +7,11 @@ class AvalonGame:
             raise ValueError("游戏人数必须在5-10人之间")
             
         self.player_count = player_count
-        self.players = []
         self.current_quest = 0
         self.quest_results = []
-        self.quest_team = []
         self.leader_index = 0
         self.vote_track = 0
+        self.quest_team = []
         
         # 设置每个任务需要的人数
         self.quest_requirements = {
@@ -24,32 +23,29 @@ class AvalonGame:
             10: [3, 4, 4, 5, 5]
         }
         
-        # 根据人数分配角色
-        self.setup_roles()
+        # 根据玩家数量获取可用角色
+        self.roles = {
+            5: ["梅林", "刺客", "爪牙", "派西维尔", "忠臣"],
+            6: ["梅林", "刺客", "爪牙", "派西维尔", "忠臣", "忠臣"],
+            7: ["梅林", "刺客", "爪牙", "派西维尔", "忠臣", "忠臣", "忠臣"],
+            8: ["梅林", "刺客", "爪牙", "爪牙", "派西维尔", "忠臣", "忠臣", "忠臣"],
+            9: ["梅林", "刺客", "爪牙", "爪牙", "派西维尔", "忠臣", "忠臣", "忠臣", "忠臣"],
+            10: ["梅林", "刺客", "爪牙", "爪牙", "派西维尔", "忠臣", "忠臣", "忠臣", "忠臣", "忠臣"]
+        }
         
-    def setup_roles(self):
-        # 基础角色配置
-        roles = ['梅林', '刺客']
-        evil_count = {
-            5: 2,
-            6: 2,
-            7: 3,
-            8: 3,
-            9: 3,
-            10: 4
-        }[self.player_count]
+        # 初始化玩家列表，但不分配角色
+        self.players = [(f"玩家{i+1}", None) for i in range(player_count)]
+        self.roles_assigned = False
+
+    def assign_roles(self):
+        """在所有玩家加入后分配角色"""
+        if self.roles_assigned:
+            return
         
-        # 添加爪牙
-        minions_needed = evil_count - 1  # 减去已有的刺客
-        roles.extend(['爪牙'] * minions_needed)
-        
-        # 添加忠臣
-        loyal_count = self.player_count - len(roles)
-        roles.extend(['忠臣'] * loyal_count)
-        
-        # 随机分配角色
-        random.shuffle(roles)
-        self.players = [(f"玩家{i+1}", role) for i, role in enumerate(roles)]
+        available_roles = self.roles[self.player_count].copy()
+        random.shuffle(available_roles)
+        self.players = [(name, available_roles[i]) for i, (name, _) in enumerate(self.players)]
+        self.roles_assigned = True
         
     def get_quest_requirement(self) -> int:
         return self.quest_requirements[self.player_count][self.current_quest]
@@ -68,6 +64,8 @@ class AvalonGame:
         approve_count = sum(1 for v in votes if v)
         if approve_count > len(votes) // 2:
             self.vote_track = 0
+            if not self.quest_team:
+                return False
             return True
         
         self.vote_track += 1
@@ -76,6 +74,7 @@ class AvalonGame:
             return False
             
         self.leader_index = (self.leader_index + 1) % self.player_count
+        self.quest_team = []  # 清空队员列表
         return False
         
     def quest_vote(self, votes: List[bool]) -> bool:
