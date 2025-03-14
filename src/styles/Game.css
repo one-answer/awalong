@@ -21,19 +21,42 @@
 
 .game-welcome {
   text-align: center;
-  padding: 20px;
+  padding: 40px;
 }
 
 .join-form {
-  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 20px 0;
 }
 
 .join-form input {
   padding: 10px;
   font-size: 16px;
-  border-radius: 4px;
   border: 1px solid #ccc;
+  border-radius: 4px;
   width: 200px;
+}
+
+.join-button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.join-button:hover {
+  background-color: #45a049;
+}
+
+.hint {
+  color: #666;
+  font-size: 14px;
+  margin-top: 10px;
 }
 
 .rules-button {

@@ -89,4 +89,13 @@ export class SocketManager {
       callback(this.statsManager.getStats(playerId));
     });
   }
+
+  public joinRoom(roomId: string): void {
+    this.gameId = roomId;
+    this.socket.emit('joinGame', roomId);
+  }
+
+  public getGameId(): string {
+    return this.gameId;
+  }
 }

@@ -7,97 +7,56 @@ interface RulesGuideProps {
 
 const RulesGuide: React.FC<RulesGuideProps> = ({ onClose }) => {
   return (
-    <div className="rules-guide">
+    <div className="rules-overlay">
       <div className="rules-content">
-        <h2>游戏规则说明</h2>
+        <h2>阿瓦隆游戏规则</h2>
         
-        <section className="rule-section">
-          <h3>基本规则</h3>
+        <section>
+          <h3>游戏简介</h3>
+          <p>阿瓦隆是一个需要5-10名玩家参与的社交推理游戏。玩家分为正义阵营和邪恶阵营，双方为了各自的胜利目标而展开博弈。</p>
+        </section>
+
+        <section>
+          <h3>角色分配</h3>
           <ul>
-            <li>游戏分为正义阵营和邪恶阵营</li>
-            <li>正义阵营需要完成3次任务获胜</li>
-            <li>邪恶阵营需要使3次任务失败或者成功刺杀梅林</li>
-            <li>每轮由队长选择任务队员</li>
-            <li>所有玩家对队伍进行投票</li>
-            <li>连续5次队伍提议被否决，邪恶阵营获胜</li>
+            <li>正义阵营：梅林、派西维尔、忠臣</li>
+            <li>邪恶阵营：莫德雷德、莫甘娜、奥伯伦、刺客</li>
           </ul>
         </section>
 
-        <section className="rule-section">
-          <h3>角色说明</h3>
-          <div className="role-cards">
-            <div className="role-card good">
-              <h4>梅林</h4>
-              <p>能看到所有邪恶角色（除莫德雷德外）</p>
-            </div>
-            <div className="role-card good">
-              <h4>派西维尔</h4>
-              <p>能看到梅林和莫甘娜（但不知道谁是谁）</p>
-            </div>
-            <div className="role-card evil">
-              <h4>刺客</h4>
-              <p>可以在游戏结束时刺杀梅林</p>
-            </div>
-            <div className="role-card evil">
-              <h4>莫甘娜</h4>
-              <p>对派西维尔显示为梅林</p>
-            </div>
-            <div className="role-card evil">
-              <h4>莫德雷德</h4>
-              <p>对梅林隐身</p>
-            </div>
-            <div className="role-card evil">
-              <h4>奥伯伦</h4>
-              <p>对其他邪恶角色隐身</p>
-            </div>
-          </div>
+        <section>
+          <h3>游戏流程</h3>
+          <ol>
+            <li>每轮由一名队长选择任务队员</li>
+            <li>所有玩家对队伍组成进行投票</li>
+            <li>如果队伍获得多数同意，则执行任务</li>
+            <li>如果连续5次队伍提议被否决，邪恶阵营获胜</li>
+            <li>任务成功需要所有队员投成功票</li>
+            <li>任务失败只需一张失败票（第4轮特殊：8-10人游戏需要2张失败票）</li>
+          </ol>
         </section>
 
-        <section className="rule-section">
-          <h3>任务人数要求</h3>
-          <table className="mission-table">
-            <thead>
-              <tr>
-                <th>玩家数</th>
-                <th>任务1</th>
-                <th>任务2</th>
-                <th>任务3</th>
-                <th>任务4</th>
-                <th>任务5</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>5人</td>
-                <td>2</td>
-                <td>3</td>
-                <td>2</td>
-                <td>3</td>
-                <td>3</td>
-              </tr>
-              <tr>
-                <td>6人</td>
-                <td>2</td>
-                <td>3</td>
-                <td>4</td>
-                <td>3</td>
-                <td>4</td>
-              </tr>
-              <tr>
-                <td>7人</td>
-                <td>2</td>
-                <td>3</td>
-                <td>3</td>
-                <td>4*</td>
-                <td>4</td>
-              </tr>
-            </tbody>
-          </table>
-          <p className="note">* 标记的任务需要两张失败牌才算失败</p>
+        <section>
+          <h3>胜利条件</h3>
+          <ul>
+            <li>正义阵营：完成3次任务，并保护梅林不被刺杀</li>
+            <li>邪恶阵营：使3次任务失败，或成功刺杀梅林</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>特殊能力</h3>
+          <ul>
+            <li>梅林：知道所有邪恶角色（除莫德雷德外）</li>
+            <li>派西维尔：能看到梅林和莫甘娜（但不知道谁是谁）</li>
+            <li>莫德雷德：对梅林隐身</li>
+            <li>莫甘娜：混淆派西维尔的视野</li>
+            <li>奥伯伦：对其他邪恶角色隐身，其他邪恶角色也对他隐身</li>
+          </ul>
         </section>
 
         <button className="close-button" onClick={onClose}>
-          了解规则
+          明白了
         </button>
       </div>
     </div>
