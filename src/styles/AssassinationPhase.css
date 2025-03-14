@@ -1,0 +1,63 @@
+.assassination-phase {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.instruction {
+  color: #666;
+  margin: 20px 0;
+}
+
+.targets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.target-card {
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.target-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.target-card.selected {
+  background: #e3f2fd;
+  border-color: #2196F3;
+}
+
+.player-name {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.assassinate-button {
+  background: #f44336;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.assassinate-button:hover:not(:disabled) {
+  background: #d32f2f;
+}
+
+.assassinate-button:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
