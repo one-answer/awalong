@@ -61,21 +61,29 @@ def handle_join_game(data):
         # 给所有玩家发送他们的角色信息
         for pid, sid in game_states[game_id]['player_sids'].items():
             player_name, role = game.players[pid]
-            role_info = {'role': role}
+            role_info = {
+                'role': role,
+                'camp': game.ROLE_CAMPS[role]  # 添加阵营信息
+            }
             
             if role == '梅林':
                 evil_players = [j for j, (_, r) in enumerate(game.players)
                             if r in ["刺客", "爪牙"]]
-                role_info['evil_players'] = evil_players
+                role_info['evil_players'] = [p + 1 for p in evil_players]
+                role_info['evil_roles'] = [game.players[p][1] for p in evil_players]
             elif role in ["刺客", "爪牙"]:
                 evil_players = [j for j, (_, r) in enumerate(game.players)
                             if r in ["刺客", "爪牙"]]
-                role_info['evil_players'] = evil_players
+                role_info['evil_players'] = [p + 1 for p in evil_players]
+                role_info['evil_roles'] = [game.players[p][1] for p in evil_players]
             
             emit('role_info', role_info, room=sid)
     else:
         # 如果还有玩家未加入，发送等待消息
-        emit('role_info', {'role': '等待其他玩家加入...'})
+        emit('role_info', {
+            'role': '等待其他玩家加入...',
+            'camp': '等待中'
+        })
     
     # 广播玩家加入消息
     socketio.emit('player_joined', {
@@ -120,7 +128,8 @@ def emit_game_state(game_id):
         'required_players': game.get_quest_requirement(),
         'leader': game.leader_index + 1,
         'vote_track': game.vote_track,
-        'player_count': game.player_count
+        'player_count': game.player_count,
+        'camps': {i: game.ROLE_CAMPS[role] for i, (_, role) in enumerate(game.players)}  # 添加所有玩家的阵营信息
     }, room=game_id)
 
 @socketio.on('propose_team')

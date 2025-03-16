@@ -277,10 +277,14 @@
 
         socket.on('role_info', (data) => {
             playerRole = data.role;
-            document.getElementById('role-name').textContent = `你的角色是：${data.role}`;
+            document.getElementById('role-name').textContent = data.role === '等待其他玩家加入...' 
+                ? data.role 
+                : `你的角色是：${data.role}（${data.camp}）`;
             if (data.evil_players) {
+                const evilInfo = data.evil_players.map((player, index) => 
+                    `玩家${player}（${data.evil_roles[index]}）`).join(', ');
                 document.getElementById('role-special-info').textContent = 
-                    `你看到的邪恶方玩家是：${data.evil_players.join(', ')}`;
+                    `你看到的邪恶方玩家是：${evilInfo}`;
             }
             document.getElementById('role-info').classList.remove('hidden');
         });
@@ -292,7 +296,9 @@
             
             // 显示玩家信息
             document.getElementById('game-player-number').textContent = playerId + 1;
-            document.getElementById('game-player-role').textContent = playerRole;
+            document.getElementById('game-player-role').textContent = playerRole === '等待其他玩家加入...' 
+                ? playerRole 
+                : `${playerRole}（${data.camps[playerId]}）`;
             
             document.getElementById('current-quest').textContent = data.current_quest;
             document.getElementById('required-players').textContent = data.required_players;

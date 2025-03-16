@@ -2,6 +2,15 @@ import random
 from typing import List, Dict
 
 class AvalonGame:
+    # 添加角色阵营映射
+    ROLE_CAMPS = {
+        "梅林": "正义方",
+        "派西维尔": "正义方",
+        "忠臣": "正义方",
+        "刺客": "邪恶方",
+        "爪牙": "邪恶方"
+    }
+
     def __init__(self, player_count: int):
         if player_count < 5 or player_count > 10:
             raise ValueError("游戏人数必须在5-10人之间")
