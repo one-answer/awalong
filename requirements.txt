@@ -5,8 +5,8 @@ Flask-SocketIO==5.3.6
 # Socket.IO Dependencies
 python-socketio==5.10.0
 python-engineio==4.8.0
-eventlet==0.30.2
-dnspython==2.2.1
+gevent==23.9.1
+gevent-websocket==0.10.1
 
 # Flask Dependencies
 Werkzeug==2.3.7
