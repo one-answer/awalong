@@ -50,25 +50,68 @@
             font-family: 'Montserrat', Arial, sans-serif;
             line-height: 1.6;
             color: var(--dark-color);
-            background-color: #f8f9fa;
-            background-image: url('https://img.freepik.com/free-photo/old-parchment-paper-texture-background_1217-1705.jpg');
+            background-color: #0a121f;
+            background-image: url('https://images.unsplash.com/photo-1518709414768-a88981a4515d?q=80&w=2069&auto=format&fit=crop');
             background-attachment: fixed;
             background-size: cover;
+            background-position: center;
+            position: relative;
             max-width: 100%;
             overflow-x: hidden;
             padding: 0;
             margin: 0;
+        }
+        
+        /* 添加背景叠加层 */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(23, 32, 46, 0.85) 0%, rgba(30, 59, 95, 0.75) 50%, rgba(23, 32, 46, 0.85) 100%);
+            z-index: -1;
+        }
+        
+        /* 添加微妙的动态光效 */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/light-paper-fibers.png');
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: -1;
         }
 
         .container {
             max-width: 900px;
             margin: 0 auto;
             padding: 20px;
-            background-color: rgba(255, 255, 255, 0.95);
-            box-shadow: var(--box-shadow);
+            background-color: rgba(255, 255, 255, 0.92);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             border-radius: var(--border-radius);
             margin-top: 30px;
-            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 添加容器装饰元素 */
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/subtle-white-feathers.png');
+            opacity: 0.04;
+            pointer-events: none;
         }
 
         h1, h2, h3, h4 {
@@ -86,16 +129,30 @@
             margin-top: 30px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
             position: relative;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            background: linear-gradient(to right, #2c3e50, #4a6891);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
         }
 
         h1::after {
             content: "";
             display: block;
-            width: 80px;
+            width: 120px;
             height: 4px;
-            background-color: var(--accent-color);
+            background: linear-gradient(to right, #c0392b, #e67e22);
             margin: 10px auto 30px;
             border-radius: 2px;
+        }
+        
+        h1::before {
+            content: "⚔️";
+            display: block;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            -webkit-text-fill-color: initial;
         }
 
         h2 {
@@ -115,47 +172,72 @@
 
         /* Button styles */
         button {
-            background-color: var(--secondary-color);
+            background: linear-gradient(to bottom, var(--secondary-color), #2980b9);
             color: white;
             border: none;
             border-radius: var(--border-radius);
-            padding: 10px 20px;
+            padding: 12px 22px;
             font-family: 'Montserrat', sans-serif;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             transition: all var(--transition-speed);
             margin: 5px;
             font-size: 1rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             text-transform: uppercase;
             letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.2) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transition: all 0.8s;
+        }
+        
+        button:hover::before {
+            left: 100%;
         }
 
         button:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(to bottom, #3aa1e0, #2980b9);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
         }
 
         button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
         }
 
         button.success {
-            background-color: var(--success-color);
+            background: linear-gradient(to bottom, var(--success-color), #27ae60);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         button.success:hover {
-            background-color: #27ae60;
+            background: linear-gradient(to bottom, #40d47e, #27ae60);
         }
 
         button.danger {
-            background-color: var(--danger-color);
+            background: linear-gradient(to bottom, var(--danger-color), #c0392b);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         button.danger:hover {
-            background-color: #c0392b;
+            background: linear-gradient(to bottom, #ff6b5b, #c0392b);
         }
 
         /* Form elements */
@@ -205,17 +287,41 @@
         .create-game, .join-game {
             flex: 1;
             min-width: 280px;
-            padding: 25px;
+            padding: 30px;
             border-radius: var(--border-radius);
             background-color: white;
-            box-shadow: var(--box-shadow);
-            transition: transform var(--transition-speed);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
             border: 1px solid #e0e0e0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .create-game::before, .join-game::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--secondary-color), var(--accent-color));
+        }
+        
+        .create-game::after, .join-game::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/subtle-white-feathers.png');
+            opacity: 0.05;
+            pointer-events: none;
         }
 
         .create-game:hover, .join-game:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
         }
 
         .create-game h3, .join-game h3 {
@@ -230,25 +336,39 @@
         /* Game elements */
         .quest-result {
             display: inline-block;
-            width: 24px;
-            height: 24px;
-            margin: 0 8px;
+            width: 28px;
+            height: 28px;
+            margin: 0 10px;
             border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            transition: transform 0.2s;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
         }
-
+        
+        .quest-result::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), inset 0 -2px 4px rgba(0, 0, 0, 0.4);
+            pointer-events: none;
+        }
+        
         .quest-result:hover {
-            transform: scale(1.1);
+            transform: scale(1.2) translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
-
+        
         .success {
-            background-color: var(--good-team-color);
+            background: linear-gradient(to bottom right, #2ecc71, #27ae60);
             border: 2px solid #1c6ea4;
         }
-
+        
         .fail {
-            background-color: var(--evil-team-color);
+            background: linear-gradient(to bottom right, #e74c3c, #c0392b);
             border: 2px solid #a62c2c;
         }
 
@@ -271,15 +391,18 @@
         /* Role info section */
         .role-info {
             background-color: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: var(--border-radius);
             margin: 25px 0;
-            box-shadow: var(--box-shadow);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             border-left: 5px solid var(--primary-color);
             position: relative;
             overflow: hidden;
+            background-image: url('https://img.freepik.com/free-photo/grunge-marble-textured-background_53876-31148.jpg?w=740&t=st=1715107580~exp=1715108180~hmac=c5da29335a66c9af40cc9b3ebdea0d634be3d91dd980b4c0a42c0ea6b98b5bc5');
+            background-size: cover;
+            background-position: center;
         }
-
+        
         .role-info::before {
             content: "";
             position: absolute;
@@ -287,12 +410,22 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('https://img.freepik.com/free-vector/medieval-shield-sword-pattern-background-vector_53876-140125.jpg');
-            background-size: cover;
-            opacity: 0.05;
+            background: rgba(255, 255, 255, 0.85);
             z-index: 0;
         }
-
+        
+        .role-info::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/parchment.png');
+            opacity: 0.1;
+            z-index: 0;
+        }
+        
         .role-info h3 {
             font-size: 1.5rem;
             color: var(--primary-color);
@@ -414,17 +547,20 @@
 
         #game-id {
             display: inline-block;
-            padding: 12px 25px;
-            background-color: #f8f9fa;
+            padding: 15px 30px;
+            background: linear-gradient(to right, #f9f9f9, #f0f0f0);
             border: 2px dashed var(--accent-color);
             border-radius: var(--border-radius);
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 700;
-            letter-spacing: 5px;
+            letter-spacing: 6px;
             color: var(--primary-color);
-            margin: 15px 0;
+            margin: 20px 0;
             position: relative;
             z-index: 1;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            font-family: 'Cinzel', serif;
+            text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
         }
 
         #waiting-message {
@@ -631,14 +767,28 @@
         
         .role-good {
             color: white;
-            background-color: var(--good-team-color);
+            background: linear-gradient(to right, #2980b9, #3498db);
             border-left: 4px solid #1c6ea4;
+            box-shadow: 0 2px 10px rgba(41, 128, 185, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .role-good:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(41, 128, 185, 0.3);
         }
         
         .role-evil {
             color: white;
-            background-color: var(--evil-team-color);
+            background: linear-gradient(to right, #c0392b, #e74c3c);
             border-left: 4px solid #a62c2c;
+            box-shadow: 0 2px 10px rgba(192, 57, 43, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .role-evil:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(192, 57, 43, 0.3);
         }
         
         /* Game status section */
@@ -670,20 +820,51 @@
         /* Game card styling */
         .game-card {
             background-color: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .game-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-image: url('https://www.transparenttextures.com/patterns/parchment.png');
+            opacity: 0.1;
+            pointer-events: none;
         }
         
         /* Footer styling */
         .footer {
             margin-top: 50px;
-            padding: 20px;
-            background-color: #2c3e50;
+            padding: 25px;
+            background: linear-gradient(to right, #1c2a3e, #2c3e50);
             color: white;
             text-align: center;
             border-radius: var(--border-radius);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/silver-scales.png');
+            opacity: 0.07;
+            pointer-events: none;
         }
         
         .footer p {
@@ -782,9 +963,20 @@
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            padding: 30px;
-            animation: modalSlideIn 0.3s;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            padding: 35px;
+            animation: modalSlideIn 0.4s;
+            background-image: url('https://www.transparenttextures.com/patterns/parchment.png');
+            background-size: 300px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* 添加装饰条纹给模态框和容器 */
+        .container, .modal-content {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)),
+                url('https://www.transparenttextures.com/patterns/parchment.png');
+            background-size: 300px;
         }
         
         @keyframes modalSlideIn {
