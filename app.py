@@ -252,24 +252,58 @@ def handle_team_vote(data):
     vote = data['vote']
     player_id = int(data['player_id']) - 1  # 转换为内部索引
     
+    logger.debug(f"收到玩家{player_id+1}的投票: {vote}")
+    
     if game_id not in games:
+        logger.error(f"游戏ID {game_id} 不存在")
         emit('error', {'message': '游戏不存在'})
         return
         
     game = games[game_id]
     game_states[game_id]['team_votes'][player_id] = vote
+    logger.debug(f"当前投票状态: {game_states[game_id]['team_votes']}")
+    logger.debug(f"已投票人数: {len(game_states[game_id]['team_votes'])}, 总人数: {game.player_count}")
     
     # 检查是否所有玩家都已投票
     if len(game_states[game_id]['team_votes']) == game.player_count:
-        votes = [game_states[game_id]['team_votes'][i] 
-                for i in range(game.player_count)]
+        logger.debug("所有玩家已投票，计算结果")
+        votes = []
+        try:
+            votes = [game_states[game_id]['team_votes'][i] 
+                    for i in range(game.player_count)]
+            logger.debug(f"投票列表: {votes}")
+        except Exception as e:
+            logger.error(f"生成投票列表时出错: {str(e)}")
+            logger.debug(f"当前投票字典: {game_states[game_id]['team_votes']}")
+            # 尝试按索引顺序创建投票列表
+            votes = []
+            for i in range(game.player_count):
+                if i in game_states[game_id]['team_votes']:
+                    votes.append(game_states[game_id]['team_votes'][i])
+                else:
+                    logger.error(f"玩家{i+1}的投票数据缺失")
+                    # 默认为反对票
+                    votes.append(False)
+        
         result = game.team_vote(votes)
+        logger.debug(f"投票结果: {'通过' if result else '未通过'}")
+        logger.debug(f"任务队员: {game.quest_team}")
+        
+        # 转换为前端所需的格式
+        team_votes_for_client = {str(k): v for k, v in game_states[game_id]['team_votes'].items()}
+        logger.debug(f"发送给客户端的投票数据: {team_votes_for_client}")
+        
         socketio.emit('team_vote_result', {
             'success': result,
-            'votes': {str(k): v for k, v in game_states[game_id]['team_votes'].items()},  # 转换为字符串键
+            'votes': team_votes_for_client,
             'team': [x + 1 for x in game.quest_team] if result else []  # 如果投票通过，发送队员列表
         }, room=game_id)
-        game_states[game_id]['team_votes'] = {}  # 重置投票状态
+        
+        # 重置投票状态
+        game_states[game_id]['team_votes'] = {}
+        logger.debug("投票状态已重置")
+        
+        # 更新游戏状态
         emit_game_state(game_id)
 
 @socketio.on('quest_vote')

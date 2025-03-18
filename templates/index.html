@@ -1243,49 +1243,57 @@
         });
 
         socket.on('team_vote_result', (data) => {
-            document.getElementById('team-vote').classList.add('hidden');
-            // 显示投票结果
-            const voteResults = Object.entries(data.votes)
-                .sort((a, b) => parseInt(a[0]) - parseInt(b[0]))  // 按玩家编号排序
-                .map(([pid, vote]) => `玩家${parseInt(pid)+1}: ${vote ? '同意' : '反对'}`)
-                .join(', ');
-            alert(`投票结果：${voteResults}`);
-            
-            if (data.success) {
-                // 详细记录调试信息
-                console.log("当前玩家ID(原始值):", myPlayerId, "类型:", typeof myPlayerId);
-                const playerIdNumber = parseInt(myPlayerId);
-                console.log("当前玩家ID(转换后):", playerIdNumber, "类型:", typeof playerIdNumber);
-                console.log("任务队员:", data.team, "类型:", typeof data.team[0]);
+            console.log('收到团队投票结果:', data);
+            try {
+                document.getElementById('team-vote').classList.add('hidden');
                 
-                // 直接比较数字，不使用includes
-                let isInTeam = false;
-                for (let i = 0; i < data.team.length; i++) {
-                    console.log(`比较: ${playerIdNumber} vs ${data.team[i]}`);
-                    if (playerIdNumber === data.team[i]) {
-                        isInTeam = true;
-                        break;
+                // 显示投票结果
+                const voteResults = Object.entries(data.votes)
+                    .sort((a, b) => parseInt(a[0]) - parseInt(b[0]))  // 按玩家编号排序
+                    .map(([pid, vote]) => `玩家${parseInt(pid)+1}: ${vote ? '同意' : '反对'}`)
+                    .join(', ');
+                
+                console.log('投票结果字符串:', voteResults);
+                alert(`投票结果：${voteResults}`);
+                
+                if (data.success) {
+                    // 详细记录调试信息
+                    console.log("当前玩家ID(原始值):", myPlayerId, "类型:", typeof myPlayerId);
+                    const playerIdNumber = parseInt(myPlayerId);
+                    console.log("当前玩家ID(转换后):", playerIdNumber, "类型:", typeof playerIdNumber);
+                    console.log("任务队员:", data.team, "类型:", typeof data.team[0]);
+                    
+                    // 直接比较数字，不使用includes
+                    let isInTeam = false;
+                    for (let i = 0; i < data.team.length; i++) {
+                        console.log(`比较: ${playerIdNumber} vs ${data.team[i]}`);
+                        if (playerIdNumber === data.team[i]) {
+                            isInTeam = true;
+                            break;
+                        }
+                    }
+                    
+                    console.log("玩家是否在团队中:", isInTeam);
+                    
+                    if (isInTeam) {
+                        console.log("显示任务投票按钮");
+                        document.getElementById('quest-vote').classList.remove('hidden');
+                    } else {
+                        console.log("玩家不在任务队员中，不显示投票按钮");
+                    }
+                    
+                    // 显示被选中的队员
+                    const questInfo = document.createElement('p');
+                    questInfo.textContent = `执行任务的队员：${data.team.map(id => `玩家${id}`).join(', ')}`;
+                    document.getElementById('game-info').appendChild(questInfo);
+                    // 清除之前的队员信息
+                    const oldTeamInfo = document.querySelector('#team-vote p');
+                    if (oldTeamInfo) {
+                        oldTeamInfo.remove();
                     }
                 }
-                
-                console.log("玩家是否在团队中:", isInTeam);
-                
-                if (isInTeam) {
-                    console.log("显示任务投票按钮");
-                    document.getElementById('quest-vote').classList.remove('hidden');
-                } else {
-                    console.log("玩家不在任务队员中，不显示投票按钮");
-                }
-                
-                // 显示被选中的队员
-                const questInfo = document.createElement('p');
-                questInfo.textContent = `执行任务的队员：${data.team.map(id => `玩家${id}`).join(', ')}`;
-                document.getElementById('game-info').appendChild(questInfo);
-                // 清除之前的队员信息
-                const oldTeamInfo = document.querySelector('#team-vote p');
-                if (oldTeamInfo) {
-                    oldTeamInfo.remove();
-                }
+            } catch (error) {
+                console.error('处理投票结果时出错:', error);
             }
         });
 
@@ -1333,6 +1341,12 @@
             console.log('Game validated response:', data);
             
             if (data.valid) {
+                // 保存游戏ID到全局变量（从验证请求中获取）
+                const gameIdInput = document.getElementById('game-id-input');
+                const validatedGameId = gameIdInput.value.trim();
+                window.gameId = validatedGameId;
+                console.log(`游戏验证成功，设置window.gameId = ${validatedGameId}`);
+                
                 document.getElementById('setup-screen').classList.add('hidden');
                 document.getElementById('role-screen').classList.remove('hidden');
                 
@@ -1429,6 +1443,7 @@
         function submitTeamVote(approve) {
             // 使用正确的gameId变量
             const currentGameId = window.gameId || gameId;
+            console.log(`正在提交团队投票, window.gameId = ${window.gameId}, gameId = ${gameId}, 使用: ${currentGameId}`);
             
             // 确保玩家ID是整数
             const playerId = parseInt(myPlayerId);
@@ -1535,6 +1550,10 @@
             console.log('Joined game successfully:', data);
             const gameId = data.game_id;
             const playerId = data.player_id;
+            
+            // 保存游戏ID到全局变量
+            window.gameId = gameId;
+            console.log(`设置window.gameId = ${gameId}`);
             
             // 清除任何超时处理器
             if (window.joinTimeoutId) {
