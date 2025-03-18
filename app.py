@@ -37,7 +37,33 @@ def handle_create_game():
     }
     logger.debug(f"Rooms after creation: {rooms}")
     
-    emit('game_created', {'game_id': room})
+    # 初始化游戏状态
+    if room not in game_states:
+        logger.debug(f"Initializing game state for room {room}")
+        game_states[room] = {
+            'connected_players': set(),
+            'player_sids': {},
+            'team_votes': {},
+            'quest_votes': {}
+        }
+    
+    # 添加创建者到玩家列表
+    player_number = 0
+    rooms[room]['players'].append({
+        'sid': request.sid,
+        'number': player_number + 1
+    })
+    
+    # 更新游戏状态中的玩家信息
+    game_states[room]['connected_players'].add(player_number)
+    game_states[room]['player_sids'][player_number] = request.sid
+    
+    emit('game_created', {
+        'game_id': room,
+        'player_id': player_number + 1,
+        'player_count': 1,
+        'connected_players': [1]
+    })
     logger.debug(f"Emitted game_created event with game ID: {room}")
     return room
 

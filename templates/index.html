@@ -809,15 +809,16 @@
             <p id="waiting-message"><i class="fas fa-hourglass-half"></i> 等待其他玩家加入...</p>
         </div>
 
-        <div class="player-info">
+        <!-- 玩家角色信息 - 初始隐藏 -->
+        <div class="player-info hidden">
             <h2>你的角色信息</h2>
             <p id="player-name"></p>
             <p id="player-role"></p>
             <p id="player-camp"></p>
         </div>
 
-        <!-- 添加邪恶方信息显示区域 -->
-        <div class="evil-players-info">
+        <!-- 添加邪恶方信息显示区域 - 初始隐藏 -->
+        <div class="evil-players-info hidden">
             <h3 id="evil-info-title"></h3>
             <ul id="evil-players-list"></ul>
         </div>
@@ -919,6 +920,9 @@
             console.log('Game created:', data);
             const gameId = data.game_id;
             
+            // 保存游戏ID到全局变量
+            window.gameId = gameId;
+            
             // 显示游戏ID
             const gameInfoDiv = document.querySelector('.game-info');
             const gameIdSpan = document.getElementById('game-id');
@@ -926,6 +930,28 @@
             if (gameIdSpan && gameInfoDiv) {
                 gameIdSpan.textContent = gameId;
                 gameInfoDiv.style.display = 'block';
+            }
+
+            // 更新玩家状态
+            if (data.player_id !== undefined) {
+                myPlayerId = data.player_id;
+                
+                // 设置玩家编号显示
+                document.getElementById('your-player-number').textContent = myPlayerId;
+                
+                // 隐藏设置界面，显示角色界面
+                document.getElementById('setup-screen').classList.add('hidden');
+                document.getElementById('role-screen').classList.remove('hidden');
+                
+                // 设置房间人数显示
+                document.getElementById('player-count-display').textContent = data.player_count;
+                
+                // 更新已连接玩家显示
+                if (data.connected_players) {
+                    updateConnectedPlayers(data.connected_players);
+                }
+                
+                console.log('Switched to role screen after creating game');
             }
         });
 
@@ -975,7 +1001,8 @@
                         }
                     }
                     
-                    evilPlayersInfo.style.display = 'block';
+                    // 使用classList切换hidden类
+                    evilPlayersInfo.classList.remove('hidden');
                     addFadeInAnimation(evilPlayersInfo);
                 }
             } else {
