@@ -157,7 +157,7 @@ def handle_join_game(data):
             # 先发送加入成功的确认
             emit('joined_game', {
                 'game_id': room, 
-                'player_id': player_number,
+                'player_id': player_number + 1,
                 'player_count': len(rooms[room]['players']),
                 'connected_players': [p['number'] for p in rooms[room]['players']]
             })

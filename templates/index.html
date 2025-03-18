@@ -1010,8 +1010,8 @@
         // 在连接时保存玩家ID
         socket.on('connect', function() {
             console.log('Connected to server');
-            myPlayerId = socket.id.substr(0, 4);
-            console.log('My Player ID:', myPlayerId);
+            // 不再在这里设置myPlayerId，等待服务器分配
+            console.log('Socket connected with ID:', socket.id);
             
             // 初始化开始游戏按钮
             setTimeout(updateStartGameButton, 500);
@@ -1252,15 +1252,31 @@
             alert(`投票结果：${voteResults}`);
             
             if (data.success) {
-                // 检查当前玩家是否在任务队员中
-                console.log("当前玩家ID:", myPlayerId);
-                console.log("任务队员:", data.team);
-                console.log("检查玩家是否在团队中:", data.team.includes(parseInt(myPlayerId)));
+                // 详细记录调试信息
+                console.log("当前玩家ID(原始值):", myPlayerId, "类型:", typeof myPlayerId);
+                const playerIdNumber = parseInt(myPlayerId);
+                console.log("当前玩家ID(转换后):", playerIdNumber, "类型:", typeof playerIdNumber);
+                console.log("任务队员:", data.team, "类型:", typeof data.team[0]);
                 
-                if (data.team.includes(parseInt(myPlayerId))) {
-                    document.getElementById('quest-vote').classList.remove('hidden');
-                    console.log("显示任务投票按钮");
+                // 直接比较数字，不使用includes
+                let isInTeam = false;
+                for (let i = 0; i < data.team.length; i++) {
+                    console.log(`比较: ${playerIdNumber} vs ${data.team[i]}`);
+                    if (playerIdNumber === data.team[i]) {
+                        isInTeam = true;
+                        break;
+                    }
                 }
+                
+                console.log("玩家是否在团队中:", isInTeam);
+                
+                if (isInTeam) {
+                    console.log("显示任务投票按钮");
+                    document.getElementById('quest-vote').classList.remove('hidden');
+                } else {
+                    console.log("玩家不在任务队员中，不显示投票按钮");
+                }
+                
                 // 显示被选中的队员
                 const questInfo = document.createElement('p');
                 questInfo.textContent = `执行任务的队员：${data.team.map(id => `玩家${id}`).join(', ')}`;
@@ -1432,7 +1448,8 @@
             
             // 确保玩家ID是整数
             const playerId = parseInt(myPlayerId);
-            console.log(`提交任务投票: ${success ? '成功' : '失败'}, 玩家ID: ${playerId}`);
+            console.log(`提交任务投票: 玩家ID=${playerId}, 投票=${success ? '成功' : '失败'}`);
+            console.log(`原始myPlayerId=${myPlayerId}, 类型=${typeof myPlayerId}`);
             
             socket.emit('quest_vote', {
                 game_id: currentGameId,
