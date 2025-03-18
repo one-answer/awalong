@@ -2,6 +2,12 @@ from flask import Flask, render_template, jsonify, request, session
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from avalon import AvalonGame
 import secrets
+import random
+import logging
+
+# 设置日志级别
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
@@ -9,92 +15,155 @@ app.secret_key = secrets.token_hex(16)
 socketio = SocketIO(app, cors_allowed_origins="*")
 games = {}  # 存储游戏实例
 game_states = {}  # 存储每个游戏的状态
+rooms = {}  # 存储房间信息
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @socketio.on('create_game')
-def handle_create_game(data):
-    player_count = int(data['player_count'])
-    game_id = secrets.token_hex(8)
-    games[game_id] = AvalonGame(player_count)
-    game_states[game_id] = {
-        'team_votes': {},
-        'quest_votes': {},
-        'connected_players': set()
+def handle_create_game():
+    logger.debug("Handling create_game request")
+    room = generate_game_id()
+    logger.debug(f"Created room with ID: {room}")
+    
+    join_room(room)
+    
+    # 初始化房间数据
+    rooms[room] = {
+        'players': [],
+        'started': False,
+        'game_id': room
     }
-    emit('game_created', {'game_id': game_id})
+    logger.debug(f"Rooms after creation: {rooms}")
+    
+    emit('game_created', {'game_id': room})
+    logger.debug(f"Emitted game_created event with game ID: {room}")
+    return room
 
 @socketio.on('join_game')
 def handle_join_game(data):
-    game_id = data['game_id']
-    
-    if game_id not in games:
-        emit('error', {'message': '游戏不存在'})
-        return
+    """处理加入游戏的请求"""
+    try:
+        room = data.get('game_id')
+        logger.debug(f"Attempting to join game with ID: {room}")
+        logger.debug(f"Request SID: {request.sid}")
+        logger.debug(f"Current rooms: {list(rooms.keys())}")
         
-    game = games[game_id]
-    
-    # 自动分配最小的可用编号
-    connected_players = game_states[game_id]['connected_players']
-    if len(connected_players) >= game.player_count:
-        emit('error', {'message': '房间已满'})
-        return
+        # 检查游戏ID是否存在
+        if not room:
+            logger.error("Missing game_id in join_game request")
+            emit('error', {'message': '游戏ID不能为空'})
+            return False
         
-    for i in range(game.player_count):
-        if i not in connected_players:
-            player_id = i
-            break
-    
-    join_room(game_id)
-    game_states[game_id]['connected_players'].add(player_id)
-    
-    # 存储玩家的socket id
-    if 'player_sids' not in game_states[game_id]:
-        game_states[game_id]['player_sids'] = {}
-    game_states[game_id]['player_sids'][player_id] = request.sid
-    
-    # 当所有玩家都加入后，分配角色
-    if len(game_states[game_id]['connected_players']) == game.player_count:
-        game.assign_roles()
-        # 给所有玩家发送他们的角色信息
-        for pid, sid in game_states[game_id]['player_sids'].items():
-            player_name, role = game.players[pid]
-            role_info = {
-                'role': role,
-                'camp': game.ROLE_CAMPS[role]  # 添加阵营信息
-            }
+        # 确保room是字符串类型
+        room = str(room)
+        
+        # 检查游戏室是否存在
+        if room not in rooms:
+            logger.debug(f"Room {room} not found")
+            logger.debug(f"Available rooms: {list(rooms.keys())}")
+            emit('error', {'message': '游戏ID不存在'})
+            return False
+        
+        # 游戏室存在
+        logger.debug(f"Found room {room}")
+        
+        # 检查玩家是否已经在该房间中
+        player_sids = []
+        if room in game_states and 'player_sids' in game_states[room]:
+            player_sids = list(game_states[room]['player_sids'].values())
+        
+        if request.sid in player_sids:
+            logger.debug(f"Player {request.sid} already in room {room}")
+            emit('error', {'message': '你已经在该游戏中'})
+            return False
+        
+        # 检查游戏是否已经开始
+        if rooms[room]['started']:
+            logger.debug(f"Room {room} has already started")
+            emit('error', {'message': '游戏已经开始'})
+            return False
+        
+        # 处理加入游戏
+        try:
+            # 初始化游戏状态
+            if room not in game_states:
+                logger.debug(f"Initializing game state for room {room}")
+                game_states[room] = {
+                    'connected_players': set(),
+                    'player_sids': {},
+                    'team_votes': {},
+                    'quest_votes': {}
+                }
             
-            if role == '梅林':
-                evil_players = [j for j, (_, r) in enumerate(game.players)
-                            if r in ["刺客", "爪牙"]]
-                role_info['evil_players'] = [p + 1 for p in evil_players]
-                role_info['evil_roles'] = [game.players[p][1] for p in evil_players]
-            elif role in ["刺客", "爪牙"]:
-                evil_players = [j for j, (_, r) in enumerate(game.players)
-                            if r in ["刺客", "爪牙"]]
-                role_info['evil_players'] = [p + 1 for p in evil_players]
-                role_info['evil_roles'] = [game.players[p][1] for p in evil_players]
+            # 检查房间是否已满
+            max_players = 5  # 默认最大玩家数
+            if 'players' not in rooms[room]:
+                rooms[room]['players'] = []
+                
+            if len(rooms[room]['players']) >= max_players:
+                logger.debug(f"Room {room} is full")
+                emit('error', {'message': '游戏房间已满'})
+                return False
             
-            emit('role_info', role_info, room=sid)
-    else:
-        # 如果还有玩家未加入，发送等待消息
-        emit('role_info', {
-            'role': '等待其他玩家加入...',
-            'camp': '等待中'
-        })
-    
-    # 广播玩家加入消息
-    socketio.emit('player_joined', {
-        'player_id': player_id,
-        'connected_players': list(game_states[game_id]['connected_players']),
-        'all_players_joined': len(game_states[game_id]['connected_players']) == game.player_count
-    }, room=game_id)
-    
-    # 只有当所有玩家都加入后才开始游戏
-    if len(game_states[game_id]['connected_players']) == game.player_count:
-        emit_game_state(game_id)
+            # 获取当前玩家编号（基于已加入玩家数量）
+            player_number = len(rooms[room]['players'])
+            logger.debug(f"Assigning player number {player_number + 1} in room {room}")
+            
+            # 添加新玩家到房间
+            rooms[room]['players'].append({
+                'sid': request.sid,
+                'number': player_number + 1
+            })
+            
+            # 更新游戏状态中的玩家信息
+            game_states[room]['connected_players'].add(player_number)
+            game_states[room]['player_sids'][player_number] = request.sid
+            
+            # 现在真正加入Socket.IO房间
+            join_room(room)
+            logger.debug(f"Successfully joined room: {room}")
+            
+            logger.debug(f"Added player {player_number + 1} to room {room}")
+            logger.debug(f"Current players in room: {[p['number'] for p in rooms[room]['players']]}")
+            
+            # 先发送加入成功的确认
+            emit('joined_game', {
+                'game_id': room, 
+                'player_id': player_number,
+                'player_count': len(rooms[room]['players']),
+                'connected_players': [p['number'] for p in rooms[room]['players']]
+            })
+            logger.debug(f"Emitted joined_game event for room: {room}")
+            
+            # 广播玩家加入信息
+            socketio.emit('player_joined', {
+                'player_id': player_number + 1,
+                'connected_players': [p['number'] for p in rooms[room]['players']],
+                'player_count': len(rooms[room]['players'])
+            }, room=room)
+            
+            # 如果达到5个玩家，开始游戏
+            if len(rooms[room]['players']) == 5:
+                logger.debug(f"Room {room} has 5 players, starting game")
+                start_game(room)
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error processing join_game: {str(e)}")
+            logger.exception("详细错误堆栈")
+            emit('error', {'message': f'加入游戏处理失败: {str(e)}'})
+            return False
+    except Exception as e:
+        logger.error(f"Unexpected error in join_game: {str(e)}")
+        logger.exception("详细错误堆栈")
+        try:
+            emit('error', {'message': f'加入游戏失败: {str(e)}'})
+        except Exception as emit_error:
+            logger.error(f"Failed to emit error: {str(emit_error)}")
+        return False
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -233,18 +302,156 @@ def handle_assassinate(data):
 
 @socketio.on('validate_game')
 def handle_validate_game(data):
-    game_id = data['game_id']
-    if game_id in games:
-        game = games[game_id]
+    game_id = data.get('game_id', '')
+    logger.debug(f"Validating game with ID: {game_id}")
+    logger.debug(f"All rooms: {list(rooms.keys())}")
+    
+    if not game_id:
+        logger.error("Empty game_id in validate_game request")
+        emit('game_validated', {
+            'valid': False,
+            'message': '游戏ID不能为空'
+        })
+        return
+    
+    # 确保game_id是字符串
+    game_id = str(game_id)
+    
+    if game_id in rooms:  # 使用 rooms 而不是 games 来验证
+        logger.debug(f"Found game {game_id}")
+        room = rooms[game_id]
+        
+        # 确保 game_states 中有该游戏的条目
+        if game_id not in game_states:
+            logger.debug(f"Initializing game_states for game {game_id}")
+            game_states[game_id] = {
+                'connected_players': set(),
+                'player_sids': {}
+            }
+        
+        connected_players = []
+        if 'connected_players' in game_states[game_id]:
+            connected_players = [p + 1 for p in game_states[game_id]['connected_players']]
+            logger.debug(f"Connected players for game {game_id}: {connected_players}")
+        
         emit('game_validated', {
             'valid': True,
-            'player_count': game.player_count,
-            'connected_players': [p + 1 for p in game_states[game_id]['connected_players']]
+            'player_count': len(room['players']),  # 使用房间中的玩家数量
+            'connected_players': connected_players
         })
+        logger.debug(f"Sent game_validated:true for game {game_id}")
     else:
+        logger.debug(f"Game {game_id} not found")
         emit('game_validated', {
-            'valid': False
+            'valid': False,
+            'message': '游戏ID不存在'
         })
+        logger.debug(f"Sent game_validated:false for game {game_id}")
+
+def send_role_info(players, roles):
+    print("开始发送角色信息...")
+    print(f"当前所有玩家信息: {players}")
+    
+    for player in players:
+        role = player['role']
+        print(f"\n处理玩家 {player['name']}, 角色: {role}, sid: {player['sid']}")
+        
+        if role == '梅林':
+            print(f"发现梅林玩家: {player['name']}")
+            evil_players = [p for p in players if p['camp'] == 'evil' and p['role'] != '莫德雷德']
+            print(f"梅林可见的邪恶方玩家: {evil_players}")
+            evil_info = [{
+                'name': p['name'],
+                'role': p['role']
+            } for p in evil_players]
+            print(f"准备发送给梅林的信息: {evil_info}")
+            socketio.emit('evil_players_info', evil_info, room=player['sid'])
+            
+        elif player['camp'] == 'evil':
+            print(f"发现邪恶方玩家: {player['name']}")
+            other_evil_players = [p for p in players if p['camp'] == 'evil' and p['sid'] != player['sid']]
+            print(f"该邪恶方可见的其他邪恶方: {other_evil_players}")
+            evil_info = [{
+                'name': p['name'],
+                'role': p['role']
+            } for p in other_evil_players]
+            print(f"准备发送给邪恶方的信息: {evil_info}")
+            socketio.emit('evil_players_info', evil_info, room=player['sid'])
+
+def generate_game_id():
+    game_id = str(random.randint(1000, 9999))
+    logger.debug(f"Generated new game ID: {game_id}")
+    return game_id
+
+# 如果还有其他地方可能生成或使用房间ID，也需要检查
+@socketio.on('connect')
+def handle_connect():
+    logger.debug(f"New client connected: {request.sid}")
+
+# 添加错误处理
+@socketio.on_error()
+def error_handler(e):
+    logger.error(f"SocketIO error: {str(e)}")
+    emit('error', {'message': '发生错误，请重试'})
+
+def start_game(room):
+    """开始游戏"""
+    logger.debug(f"Starting game in room {room}")
+    rooms[room]['started'] = True
+    
+    # 创建游戏实例
+    game = AvalonGame(5)  # 5个玩家
+    games[room] = game
+    game.assign_roles()
+    
+    logger.debug("Assigning roles to players...")
+    # 给每个玩家发送角色信息
+    for player in rooms[room]['players']:
+        player_index = player['number'] - 1
+        player_name, role = game.players[player_index]
+        logger.debug(f"Assigning role {role} to player {player['number']}")
+        
+        role_info = {
+            'role': role,
+            'camp': game.ROLE_CAMPS[role]
+        }
+        
+        if role == '梅林':
+            evil_players = [j for j, (_, r) in enumerate(game.players)
+                        if r in ["刺客", "爪牙"]]
+            role_info['evil_players'] = [p + 1 for p in evil_players]
+            role_info['evil_roles'] = [game.players[p][1] for p in evil_players]
+        elif role in ["刺客", "爪牙"]:
+            evil_players = [j for j, (_, r) in enumerate(game.players)
+                        if r in ["刺客", "爪牙"]]
+            role_info['evil_players'] = [p + 1 for p in evil_players]
+            role_info['evil_roles'] = [game.players[p][1] for p in evil_players]
+        
+        logger.debug(f"Sending role info to player {player['number']}: {role_info}")
+        # 在测试环境中使用广播
+        if app.config.get('TESTING'):
+            socketio.emit('role_info', {
+                **role_info,
+                'player_number': player['number']
+            }, broadcast=True)
+        else:
+            # 在生产环境中使用房间
+            socketio.emit('role_info', role_info, room=player['sid'])
+    
+    logger.debug("All roles assigned, sending game state...")
+    # 发送游戏开始状态
+    if app.config.get('TESTING'):
+        socketio.emit('game_state', {
+            'current_quest': game.current_quest + 1,
+            'quest_results': ['成功' if r else '失败' for r in game.quest_results],
+            'required_players': game.get_quest_requirement(),
+            'leader': game.leader_index + 1,
+            'vote_track': game.vote_track,
+            'player_count': game.player_count,
+            'camps': {i: game.ROLE_CAMPS[role] for i, (_, role) in enumerate(game.players)}
+        }, broadcast=True)
+    else:
+        emit_game_state(room)
 
 if __name__ == '__main__':
     # 修改运行配置，允许外部访问

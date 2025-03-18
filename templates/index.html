@@ -1,349 +1,1040 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <title>阿瓦隆在线</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="阿瓦隆(Avalon)在线游戏，经典的桌游电子版">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3811349067654166"
 			crossorigin="anonymous"></script>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-QRBM2PKEYL"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QRBM2PKEYL"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-  gtag('config', 'G-QRBM2PKEYL');
-</script>
+      gtag('config', 'G-QRBM2PKEYL');
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e67e22;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --info-color: #3498db;
+            --good-team-color: #2980b9;
+            --evil-team-color: #c0392b;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
+            font-family: 'Montserrat', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #f8f9fa;
+            background-image: url('https://img.freepik.com/free-photo/old-parchment-paper-texture-background_1217-1705.jpg');
+            background-attachment: fixed;
+            background-size: cover;
+            max-width: 100%;
+            overflow-x: hidden;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: var(--box-shadow);
+            border-radius: var(--border-radius);
+            margin-top: 30px;
+            margin-bottom: 30px;
         }
-        .hidden {
-            display: none;
-        }
-        .quest-result {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            margin: 0 5px;
-            border-radius: 50%;
-        }
-        .success {
-            background-color: blue;
-        }
-        .fail {
-            background-color: red;
-        }
-        .vote-track {
-            display: inline-block;
-            width: 15px;
-            height: 15px;
-            margin: 0 3px;
-            border: 1px solid black;
-            border-radius: 50%;
-        }
-        .vote-track.active {
-            background-color: red;
-        }
-        button {
-            margin: 5px;
-            padding: 5px 10px;
-        }
-        .role-info {
-            margin: 20px 0;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .setup-options {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-        }
-        
-        .create-game, .join-game {
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 45%;
-        }
-        
-        input[type="text"] {
-            padding: 5px;
-            margin: 5px 0;
-            width: 200px;
-        }
-        
-        .game-id {
-            background-color: #f0f0f0;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
+
+        h1, h2, h3, h4 {
+            font-family: 'Cinzel', serif;
+            color: var(--primary-color);
+            margin-bottom: 20px;
             text-align: center;
         }
-        
-        .copy-button {
-            background-color: #4CAF50;
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        h1::after {
+            content: "";
+            display: block;
+            width: 80px;
+            height: 4px;
+            background-color: var(--accent-color);
+            margin: 10px auto 30px;
+            border-radius: 2px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Button styles */
+        button {
+            background-color: var(--secondary-color);
             color: white;
             border: none;
-            padding: 5px 10px;
+            border-radius: var(--border-radius);
+            padding: 10px 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
             cursor: pointer;
+            transition: all var(--transition-speed);
+            margin: 5px;
+            font-size: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        
-        .copy-button:hover {
-            background-color: #45a049;
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
-        
-        .room-info {
-            background-color: #f5f5f5;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 5px;
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        button.success {
+            background-color: var(--success-color);
+        }
+
+        button.success:hover {
+            background-color: #27ae60;
+        }
+
+        button.danger {
+            background-color: var(--danger-color);
+        }
+
+        button.danger:hover {
+            background-color: #c0392b;
+        }
+
+        /* Form elements */
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px;
             border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            transition: border-color var(--transition-speed);
         }
-        
+
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%23333' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
+        }
+
+        label {
+            font-weight: 500;
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark-color);
+        }
+
+        /* Game setup screen */
+        .setup-options {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .create-game, .join-game {
+            flex: 1;
+            min-width: 280px;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            background-color: white;
+            box-shadow: var(--box-shadow);
+            transition: transform var(--transition-speed);
+            border: 1px solid #e0e0e0;
+        }
+
+        .create-game:hover, .join-game:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .create-game h3, .join-game h3 {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        /* Game elements */
+        .quest-result {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            margin: 0 8px;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .quest-result:hover {
+            transform: scale(1.1);
+        }
+
+        .success {
+            background-color: var(--good-team-color);
+            border: 2px solid #1c6ea4;
+        }
+
+        .fail {
+            background-color: var(--evil-team-color);
+            border: 2px solid #a62c2c;
+        }
+
+        .vote-track {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin: 0 5px;
+            border: 2px solid #444;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .vote-track.active {
+            background-color: var(--danger-color);
+            border-color: #a62c2c;
+            transform: scale(1.1);
+        }
+
+        /* Role info section */
+        .role-info {
+            background-color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin: 25px 0;
+            box-shadow: var(--box-shadow);
+            border-left: 5px solid var(--primary-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .role-info::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://img.freepik.com/free-vector/medieval-shield-sword-pattern-background-vector_53876-140125.jpg');
+            background-size: cover;
+            opacity: 0.05;
+            z-index: 0;
+        }
+
+        .role-info h3 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .role-info p {
+            font-size: 1.1rem;
+            margin: 10px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Room info styles */
+        .room-info {
+            background-color: #f3f7fa;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin: 20px 0;
+            text-align: center;
+            border: 1px solid #d1e1ee;
+            box-shadow: var(--box-shadow);
+        }
+
+        .room-info h3 {
+            color: var(--secondary-color);
+            margin: 0 0 15px 0;
+            font-size: 1.4rem;
+        }
+
         .room-info p {
-            margin: 5px 0;
+            margin: 10px 0;
+            font-size: 1.1rem;
         }
-        
+
+        /* Connected players */
         .connected-player {
             display: inline-block;
-            padding: 3px 8px;
-            margin: 2px;
-            background-color: #4CAF50;
-            color: white;
-            border-radius: 3px;
-        }
-        .player-info {
-            background-color: #f0f0f0;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-        
-        .player-info p {
-            margin: 5px 0;
-            font-weight: bold;
-        }
-        
-        hr {
-            border: none;
-            border-top: 1px solid #ddd;
-            margin: 15px 0;
-        }
-        
-        #assassin-targets {
-            margin: 10px 0;
-        }
-        
-        #assassin-targets button {
+            padding: 6px 12px;
             margin: 5px;
-            padding: 8px 15px;
-            background-color: #dc3545;
+            background-color: var(--success-color);
             color: white;
-            border: none;
-            border-radius: 4px;
+            border-radius: 20px;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+
+        /* Player info */
+        .player-info {
+            background-color: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            border-left: 5px solid var(--secondary-color);
+        }
+
+        .player-info h2 {
+            color: var(--secondary-color);
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .player-info p {
+            margin: 10px 0;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        /* Game info */
+        .game-info {
+            background-color: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            margin: 25px 0;
+            box-shadow: var(--box-shadow);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+        }
+
+        .game-info::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://img.freepik.com/free-vector/golden-crown-royal-family-member_1284-42650.jpg');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: 80px;
+            opacity: 0.05;
+            z-index: 0;
+        }
+
+        .game-info h3 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        #game-id {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #f8f9fa;
+            border: 2px dashed var(--accent-color);
+            border-radius: var(--border-radius);
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 5px;
+            color: var(--primary-color);
+            margin: 15px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        #waiting-message {
+            color: #777;
+            font-style: italic;
+            margin-top: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Evil players info */
+        .evil-players-info {
+            margin: 25px 0;
+            padding: 20px;
+            border: 2px solid var(--evil-team-color);
+            border-radius: var(--border-radius);
+            background-color: #fef5f5;
+            position: relative;
+            box-shadow: var(--box-shadow);
+        }
+
+        .evil-players-info h3 {
+            color: var(--evil-team-color);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            text-align: left;
+        }
+
+        .evil-players-info ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .evil-players-info li {
+            margin: 10px 0;
+            color: #a83232;
+            font-weight: 500;
+            padding: 8px 15px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: var(--border-radius);
+            border-left: 3px solid var(--evil-team-color);
+        }
+
+        /* Game controls */
+        #team-selection, #team-vote, #quest-vote, #assassin-phase {
+            background-color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin: 25px 0;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+            animation: slideUp 0.5s;
+            border: 1px solid #e0e0e0;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #team-selection h3, #team-vote h3, #quest-vote h3, #assassin-phase h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        #team-selection-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #team-selection-buttons label {
+            display: inline-flex;
+            align-items: center;
+            background-color: #f5f5f5;
+            padding: 8px 15px;
+            border-radius: 30px;
             cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+
+        #team-selection-buttons label:hover {
+            background-color: #e9e9e9;
+        }
+
+        #team-selection-buttons input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        #team-vote button, #quest-vote button {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            margin: 10px;
+            min-width: 140px;
+        }
+
+        #team-vote button:first-child, #quest-vote button:first-child {
+            background-color: var(--success-color);
+        }
+
+        #team-vote button:last-child, #quest-vote button:last-child {
+            background-color: var(--danger-color);
+        }
+
+        #assassin-targets button {
+            background-color: var(--danger-color);
+            margin: 8px;
+            transition: all 0.2s;
+        }
+
+        #assassin-targets button:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+                margin-top: 15px;
+                margin-bottom: 15px;
+            }
+
+            .setup-options {
+                flex-direction: column;
+            }
+
+            .create-game, .join-game {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.6rem;
+            }
+
+            .game-info, .role-info, .player-info, .room-info {
+                padding: 15px;
+            }
+
+            #game-id {
+                font-size: 1.5rem;
+                padding: 10px 15px;
+                letter-spacing: 3px;
+            }
+
+            #team-vote button, #quest-vote button {
+                padding: 10px 20px;
+                width: 45%;
+                min-width: auto;
+            }
         }
         
-        #assassin-targets button:hover {
-            background-color: #c82333;
+        /* Styled horizontal rule */
+        .styled-hr {
+            border: none;
+            height: 1px;
+            background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
+            margin: 20px 0;
+        }
+        
+        /* Icon spacing in buttons */
+        button i {
+            margin-right: 8px;
+        }
+        
+        /* Game status elements */
+        #current-quest, #required-players, #current-leader {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        /* Animation for game elements appearing */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        /* Add shadows to special elements */
+        #game-id, .player-info, .role-info {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Role-specific styling */
+        .role-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
+            display: inline-block;
+            margin: 10px 0;
+        }
+        
+        .role-good {
+            color: white;
+            background-color: var(--good-team-color);
+            border-left: 4px solid #1c6ea4;
+        }
+        
+        .role-evil {
+            color: white;
+            background-color: var(--evil-team-color);
+            border-left: 4px solid #a62c2c;
+        }
+        
+        /* Game status section */
+        .game-status {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+        }
+        
+        .game-status h3 {
+            text-align: left;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .game-status p {
+            margin: 10px 0;
+            font-size: 1.05rem;
+        }
+        
+        .game-status p i {
+            width: 20px;
+            text-align: center;
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+
+        /* Game card styling */
+        .game-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 20px;
+        }
+        
+        /* Footer styling */
+        .footer {
+            margin-top: 50px;
+            padding: 20px;
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            border-radius: var(--border-radius);
+        }
+        
+        .footer p {
+            margin: 10px 0;
+        }
+        
+        .footer-links {
+            margin-top: 15px;
+        }
+        
+        .footer-links a {
+            color: #ecf0f1;
+            margin: 0 10px;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: #e67e22;
+        }
+        
+        .footer-links i {
+            margin-right: 5px;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 </head>
 <body>
-    <h1>阿瓦隆在线</h1>
+    <div class="container">
+        <h1>阿瓦隆在线</h1>
     
-    <!-- 游戏创建界面 -->
-    <div id="setup-screen">
-        <h2>阿瓦隆在线</h2>
-        <div class="setup-options">
-            <div class="create-game">
-                <h3>创建新游戏</h3>
-                <label>玩家数量：
-                    <select id="player-count">
-                        <option value="5">5人</option>
-                        <option value="6">6人</option>
-                        <option value="7">7人</option>
-                        <option value="8">8人</option>
-                        <option value="9">9人</option>
-                        <option value="10">10人</option>
-                    </select>
-                </label>
-                <button onclick="createGame()">创建游戏</button>
+        <!-- 游戏创建界面 -->
+        <div id="setup-screen">
+            <h2>阿瓦隆在线</h2>
+            <div class="setup-options">
+                <div class="create-game">
+                    <h3>创建新游戏</h3>
+                    <label>玩家数量：
+                        <select id="player-count">
+                            <option value="5">5人</option>
+                            <option value="6">6人</option>
+                            <option value="7">7人</option>
+                            <option value="8">8人</option>
+                            <option value="9">9人</option>
+                            <option value="10">10人</option>
+                        </select>
+                    </label>
+                    <button onclick="createGame()"><i class="fas fa-plus-circle"></i> 创建游戏</button>
+                </div>
+
+                <div class="join-game">
+                    <h3>加入游戏</h3>
+                    <input type="text" id="game-id-input" placeholder="输入游戏ID">
+                    <button id="join-button" onclick="joinExistingGame()"><i class="fas fa-sign-in-alt"></i> 加入游戏</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 角色选择界面 -->
+        <div id="role-screen" class="hidden">
+            <h2>等待游戏开始</h2>
+            <div class="room-info">
+                <h3><i class="fas fa-users"></i> 房间信息</h3>
+                <p><i class="fas fa-user-friends"></i> 房间人数: <span id="player-count-display"></span> 人</p>
+                <p><i class="fas fa-user-check"></i> 已加入玩家: <span id="connected-players"></span></p>
+                <p><i class="fas fa-id-badge"></i> 你的编号: <span id="your-player-number"></span></p>
+            </div>
+            <div id="role-info" class="role-info hidden">
+                <h3><i class="fas fa-chess-knight"></i> 你的角色信息</h3>
+                <p id="role-name"></p>
+                <p id="role-special-info"></p>
+            </div>
+        </div>
+
+        <!-- 游戏主界面 -->
+        <div id="game-screen" class="hidden">
+            <h2>游戏进行中</h2>
+            <div id="game-info" class="game-card">
+                <div class="player-info">
+                    <h3><i class="fas fa-user-circle"></i> 玩家信息</h3>
+                    <p><i class="fas fa-hashtag"></i> 你的编号：玩家<span id="game-player-number"></span></p>
+                    <p><i class="fas fa-mask"></i> 你的角色：<span id="game-player-role"></span></p>
+                </div>
+                <hr class="styled-hr">
+                <div class="game-status">
+                    <h3><i class="fas fa-chess-board"></i> 游戏状态</h3>
+                    <p><i class="fas fa-tasks"></i> 当前任务：<span id="current-quest"></span></p>
+                    <p><i class="fas fa-history"></i> 任务结果：<span id="quest-results"></span></p>
+                    <p><i class="fas fa-users"></i> 需要人数：<span id="required-players"></span></p>
+                    <p><i class="fas fa-crown"></i> 当前队长：玩家<span id="current-leader"></span></p>
+                    <p><i class="fas fa-vote-yea"></i> 投票追踪：<span id="vote-track"></span></p>
+                </div>
             </div>
 
-            <div class="join-game">
-                <h3>加入游戏</h3>
-                <input type="text" id="game-id-input" placeholder="输入游戏ID">
-                <button onclick="joinExistingGame()">加入游戏</button>
+            <div id="team-selection" class="hidden">
+                <h3>选择队员</h3>
+                <div id="team-selection-buttons"></div>
+                <button onclick="submitTeam()"><i class="fas fa-check-circle"></i> 确认选择</button>
+            </div>
+
+            <div id="team-vote" class="hidden">
+                <h3>队伍投票</h3>
+                <button class="success" onclick="submitTeamVote(true)"><i class="fas fa-thumbs-up"></i> 同意</button>
+                <button class="danger" onclick="submitTeamVote(false)"><i class="fas fa-thumbs-down"></i> 反对</button>
+            </div>
+
+            <div id="quest-vote" class="hidden">
+                <h3>任务投票</h3>
+                <button class="success" onclick="submitQuestVote(true)"><i class="fas fa-check"></i> 成功</button>
+                <button class="danger" onclick="submitQuestVote(false)"><i class="fas fa-times"></i> 失败</button>
+            </div>
+
+            <div id="assassin-phase" class="hidden">
+                <h3>刺客阶段</h3>
+                <p>请选择要刺杀的目标：</p>
+                <div id="assassin-targets"></div>
             </div>
         </div>
-    </div>
 
-    <!-- 角色选择界面 -->
-    <div id="role-screen" class="hidden">
-        <h2>等待游戏开始</h2>
-        <div class="room-info">
-            <p>房间人数: <span id="player-count-display"></span> 人</p>
-            <p>已加入玩家: <span id="connected-players"></span></p>
-            <p>你的编号: <span id="your-player-number"></span></p>
-        </div>
-        <div id="role-info" class="role-info hidden">
-            <h3>你的角色信息</h3>
-            <p id="role-name"></p>
-            <p id="role-special-info"></p>
-        </div>
-    </div>
-
-    <!-- 游戏主界面 -->
-    <div id="game-screen" class="hidden">
-        <h2>游戏进行中</h2>
-        <div id="game-info">
-            <div class="player-info">
-                <p>你的编号：玩家<span id="game-player-number"></span></p>
-                <p>你的角色：<span id="game-player-role"></span></p>
-            </div>
-            <hr>
-            <p>当前任务：<span id="current-quest"></span></p>
-            <p>任务结果：<span id="quest-results"></span></p>
-            <p>需要人数：<span id="required-players"></span></p>
-            <p>当前队长：玩家<span id="current-leader"></span></p>
-            <p>投票追踪：<span id="vote-track"></span></p>
+        <!-- 游戏ID显示区域 -->
+        <div class="game-info" style="display: none;">
+            <h3><i class="fas fa-gamepad"></i> 游戏ID: <span id="game-id"></span></h3>
+            <p id="waiting-message"><i class="fas fa-hourglass-half"></i> 等待其他玩家加入...</p>
         </div>
 
-        <div id="team-selection" class="hidden">
-            <h3>选择队员</h3>
-            <div id="team-selection-buttons"></div>
-            <button onclick="submitTeam()">确认选择</button>
+        <div class="player-info">
+            <h2>你的角色信息</h2>
+            <p id="player-name"></p>
+            <p id="player-role"></p>
+            <p id="player-camp"></p>
         </div>
 
-        <div id="team-vote" class="hidden">
-            <h3>队伍投票</h3>
-            <button onclick="submitTeamVote(true)">同意</button>
-            <button onclick="submitTeamVote(false)">反对</button>
+        <!-- 添加邪恶方信息显示区域 -->
+        <div class="evil-players-info">
+            <h3 id="evil-info-title"></h3>
+            <ul id="evil-players-list"></ul>
         </div>
 
-        <div id="quest-vote" class="hidden">
-            <h3>任务投票</h3>
-            <button onclick="submitQuestVote(true)">成功</button>
-            <button onclick="submitQuestVote(false)">失败</button>
-        </div>
-
-        <div id="assassin-phase" class="hidden">
-            <h3>刺客阶段</h3>
-            <p>请选择要刺杀的目标：</p>
-            <div id="assassin-targets"></div>
-        </div>
+        <!-- Footer section -->
+        <footer class="footer">
+            <p>阿瓦隆在线 © 2023 | 一个经典桌游的在线体验</p>
+            <p class="footer-links">
+                <a href="https://github.com/yourusername/avalon-online" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+                <a href="#" id="rules-link"><i class="fas fa-book"></i> 游戏规则</a>
+                <a href="mailto:contact@example.com"><i class="fas fa-envelope"></i> 联系我们</a>
+            </p>
+        </footer>
     </div>
 
     <script>
-        let socket = io({
-            transports: ['websocket'],
-            upgrade: false
-        });
-        let gameId = null;
-        let playerId = null;
-        let playerRole = null;
+        var socket = io();
+        var playerName = '';
+        var playerRole = '';
+        var playerCamp = '';
+        var myPlayerId = '';
+        var gameId = '';
+        var currentRoom = '';
+        
+        // 清除之前的事件监听器
+        socket.off('connect');
+        socket.off('role_info');
+        socket.off('join_room');
 
-        // Socket.io 事件处理
-        socket.on('connect', () => {
+        // 加入房间时显示游戏ID
+        socket.on('join_room', function(room) {
+            console.log('Joined game:', room);
+            gameId = room;
+            
+            // 显示游戏ID和等待消息
+            const gameInfoDiv = document.querySelector('.game-info');
+            const gameIdSpan = document.getElementById('game-id');
+            
+            if (gameIdSpan && gameInfoDiv) {
+                gameIdSpan.textContent = gameId;
+                gameInfoDiv.style.display = 'block';
+                addFadeInAnimation(gameInfoDiv);
+            }
+        });
+
+        // 当游戏开始时，可以隐藏等待消息
+        socket.on('game_started', function() {
+            const waitingMessage = document.getElementById('waiting-message');
+            if (waitingMessage) {
+                waitingMessage.style.display = 'none';
+            }
+        });
+
+        // 添加淡入动画的辅助函数
+        function addFadeInAnimation(element) {
+            element.classList.add('fade-in');
+            // 动画结束后移除类
+            setTimeout(() => {
+                element.classList.remove('fade-in');
+            }, 500);
+        }
+
+        // 在连接时保存玩家ID
+        socket.on('connect', function() {
             console.log('Connected to server');
+            myPlayerId = socket.id.substr(0, 4);
+            console.log('My Player ID:', myPlayerId);
         });
 
-        socket.on('error', (data) => {
-            alert(data.message);
+        // 监听错误事件
+        socket.on('error', function(data) {
+            console.error('Received error:', data);
+            
+            // 清除任何超时处理器
+            if (window.joinTimeoutId) {
+                console.log('Clearing join timeout on error');
+                clearTimeout(window.joinTimeoutId);
+                window.joinTimeoutId = null;
+            }
+            
+            // 重置按钮状态
+            const joinButton = document.getElementById('join-button');
+            if (joinButton.disabled) {
+                joinButton.disabled = false;
+                joinButton.textContent = '加入游戏';
+            }
+            
+            // 显示错误消息
+            showErrorMessage(data.message || '发生未知错误');
+            
+            // 对于特定错误，清空游戏ID输入
+            const gameIdErrors = ['游戏ID不存在', '游戏已经开始', '游戏房间已满'];
+            if (data.message && gameIdErrors.includes(data.message)) {
+                document.getElementById('game-id-input').value = '';
+            }
         });
 
         socket.on('game_created', (data) => {
-            gameId = data.game_id;
+            console.log('Game created:', data);
+            const gameId = data.game_id;
             
-            // 创建一个显示游戏ID的元素
-            const gameIdDisplay = document.createElement('div');
-            gameIdDisplay.className = 'game-id';
-            gameIdDisplay.innerHTML = `
-                游戏ID（请复制分享给其他玩家）：<br>
-                <span style="font-size: 1.2em; font-weight: bold;">${gameId}</span><br>
-                <button class="copy-button" onclick="copyGameId('${gameId}')">复制</button>
-            `;
+            // 显示游戏ID
+            const gameInfoDiv = document.querySelector('.game-info');
+            const gameIdSpan = document.getElementById('game-id');
             
-            document.querySelector('.create-game').appendChild(gameIdDisplay);
+            if (gameIdSpan && gameInfoDiv) {
+                gameIdSpan.textContent = gameId;
+                gameInfoDiv.style.display = 'block';
+            }
         });
 
+        // 更新角色信息的处理
         socket.on('role_info', (data) => {
-            playerRole = data.role;
-            document.getElementById('role-name').textContent = data.role === '等待其他玩家加入...' 
-                ? data.role 
-                : `你的角色是：${data.role}（${data.camp}）`;
-            if (data.evil_players) {
-                const evilInfo = data.evil_players.map((player, index) => 
-                    `玩家${player}（${data.evil_roles[index]}）`).join(', ');
-                document.getElementById('role-special-info').textContent = 
-                    `你看到的邪恶方玩家是：${evilInfo}`;
-            }
+            console.log('Role info received:', data);
             document.getElementById('role-info').classList.remove('hidden');
+            
+            // 显示角色信息
+            playerRole = data.role;
+            playerCamp = data.camp;
+            
+            // 更新角色信息显示
+            const roleName = document.getElementById('role-name');
+            roleName.innerHTML = `<span class="role-name role-${data.camp === '正义方' ? 'good' : 'evil'}">
+                <i class="fas fa-${data.camp === '正义方' ? 'shield-alt' : 'skull'}"></i> 
+                角色: ${data.role} (${data.camp})
+            </span>`;
+            
+            // 显示特殊信息（例如梅林可以看到的邪恶方）
+            const roleSpecialInfo = document.getElementById('role-special-info');
+            if (data.evil_players) {
+                let specialInfo = '你可以看到的邪恶方玩家：<ul>';
+                for (let i = 0; i < data.evil_players.length; i++) {
+                    const evilPlayer = data.evil_players[i];
+                    const evilRole = data.evil_roles ? data.evil_roles[i] : '未知';
+                    specialInfo += `<li>玩家${evilPlayer} - ${evilRole}</li>`;
+                }
+                specialInfo += '</ul>';
+                roleSpecialInfo.innerHTML = specialInfo;
+                
+                // 也更新页面上的邪恶方信息显示
+                const evilInfoTitle = document.getElementById('evil-info-title');
+                const evilPlayersList = document.getElementById('evil-players-list');
+                const evilPlayersInfo = document.querySelector('.evil-players-info');
+                
+                if (evilInfoTitle && evilPlayersList && evilPlayersInfo) {
+                    evilInfoTitle.textContent = data.role === '梅林' ? 
+                        '梅林看到的邪恶方玩家' : '你的邪恶同伴';
+                    
+                    evilPlayersList.innerHTML = '';
+                    for (let i = 0; i < data.evil_players.length; i++) {
+                        if (data.evil_players[i] !== myPlayerId) {  // 不显示自己
+                            const li = document.createElement('li');
+                            li.innerHTML = `玩家${data.evil_players[i]} - ${data.evil_roles ? data.evil_roles[i] : '未知'}`;
+                            evilPlayersList.appendChild(li);
+                        }
+                    }
+                    
+                    evilPlayersInfo.style.display = 'block';
+                    addFadeInAnimation(evilPlayersInfo);
+                }
+            } else {
+                roleSpecialInfo.textContent = '没有特殊信息。';
+            }
         });
 
         socket.on('game_state', (data) => {
-            // 确保游戏主界面显示
-            document.getElementById('role-screen').classList.add('hidden');
-            document.getElementById('game-screen').classList.remove('hidden');
-            
-            // 显示玩家信息
-            document.getElementById('game-player-number').textContent = playerId + 1;
-            document.getElementById('game-player-role').textContent = playerRole === '等待其他玩家加入...' 
-                ? playerRole 
-                : `${playerRole}（${data.camps[playerId]}）`;
-            
+            console.log('Game state:', data);
+            document.getElementById('game-player-number').textContent = myPlayerId;
+            document.getElementById('game-player-role').textContent = playerRole;
             document.getElementById('current-quest').textContent = data.current_quest;
             document.getElementById('required-players').textContent = data.required_players;
             document.getElementById('current-leader').textContent = data.leader;
             
-            // 更新任务结果
-            const questResults = document.getElementById('quest-results');
-            questResults.innerHTML = '';
+            // 更新任务结果显示
+            const questResultsContainer = document.getElementById('quest-results');
+            questResultsContainer.innerHTML = '';
             data.quest_results.forEach(result => {
-                const dot = document.createElement('div');
-                dot.className = `quest-result ${result === '成功' ? 'success' : 'fail'}`;
-                questResults.appendChild(dot);
+                const span = document.createElement('span');
+                span.className = `quest-result ${result === '成功' ? 'success' : 'fail'}`;
+                span.title = result;
+                questResultsContainer.appendChild(span);
+                // 添加淡入动画
+                addFadeInAnimation(span);
             });
             
-            // 更新投票追踪
-            const voteTrack = document.getElementById('vote-track');
-            voteTrack.innerHTML = '';
+            // 更新投票追踪显示
+            const voteTrackContainer = document.getElementById('vote-track');
+            voteTrackContainer.innerHTML = '';
             for (let i = 0; i < 5; i++) {
-                const dot = document.createElement('div');
-                dot.className = `vote-track${i < data.vote_track ? ' active' : ''}`;
-                voteTrack.appendChild(dot);
+                const span = document.createElement('span');
+                span.className = `vote-track ${i < data.vote_track ? 'active' : ''}`;
+                voteTrackContainer.appendChild(span);
+                // 为新激活的投票追踪添加动画
+                if (i < data.vote_track) {
+                    addFadeInAnimation(span);
+                }
             }
             
-            // 显示相应的操作界面
-            if (data.leader === playerId + 1) {  // 因为playerId是从0开始的
-                document.getElementById('team-selection').classList.remove('hidden');
-                // 创建队员选择复选框
+            // 隐藏选择队员的UI，除非当前玩家是队长
+            const isLeader = myPlayerId === data.leader;
+            document.getElementById('team-selection').className = isLeader ? '' : 'hidden';
+            
+            // 生成队员选择按钮
+            if (isLeader) {
                 const teamSelectionButtons = document.getElementById('team-selection-buttons');
                 teamSelectionButtons.innerHTML = '';
                 for (let i = 1; i <= data.player_count; i++) {
+                    const label = document.createElement('label');
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
-                    checkbox.id = `team-member-${i}`;
                     checkbox.value = i;
                     
-                    const label = document.createElement('label');
-                    label.htmlFor = `team-member-${i}`;
-                    label.textContent = `玩家${i}`;
-                    
-                    teamSelectionButtons.appendChild(checkbox);
+                    label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode(`玩家${i}`));
                     teamSelectionButtons.appendChild(label);
-                    teamSelectionButtons.appendChild(document.createElement('br'));
                 }
-            } else {
-                document.getElementById('team-selection').classList.add('hidden');
+                addFadeInAnimation(document.getElementById('team-selection'));
             }
         });
 
@@ -366,13 +1057,13 @@
             // 显示投票结果
             const voteResults = Object.entries(data.votes)
                 .sort((a, b) => parseInt(a[0]) - parseInt(b[0]))  // 按玩家编号排序
-                .map(([pid, vote]) => `玩家${parseInt(pid) + 1}: ${vote ? '同意' : '反对'}`)
+                .map(([pid, vote]) => `玩家${parseInt(pid)}: ${vote ? '同意' : '反对'}`)
                 .join(', ');
             alert(`投票结果：${voteResults}`);
             
             if (data.success) {
                 // 检查当前玩家是否在任务队员中
-                if (data.team.includes(playerId + 1)) {
+                if (data.team.includes(myPlayerId)) {
                     document.getElementById('quest-vote').classList.remove('hidden');
                 }
                 // 显示被选中的队员
@@ -404,7 +1095,7 @@
                 const assassinTargets = document.getElementById('assassin-targets');
                 assassinTargets.innerHTML = '';
                 for (let i = 1; i <= parseInt(document.getElementById('player-count-display').textContent); i++) {
-                    if (i !== playerId + 1) {  // 不能刺杀自己
+                    if (i !== myPlayerId) {  // 不能刺杀自己
                         const button = document.createElement('button');
                         button.textContent = `刺杀玩家${i}`;
                         button.onclick = () => {
@@ -428,6 +1119,8 @@
         });
 
         socket.on('game_validated', (data) => {
+            console.log('Game validated response:', data);
+            
             if (data.valid) {
                 document.getElementById('setup-screen').classList.add('hidden');
                 document.getElementById('role-screen').classList.remove('hidden');
@@ -437,25 +1130,38 @@
                 
                 // 显示已连接的玩家
                 updateConnectedPlayers(data.connected_players || []);
-                
-                // 自动加入游戏
-                socket.emit('join_game', { game_id: gameId });
-            } else {
-                alert('游戏ID不存在或游戏已结束');
             }
         });
 
         // 添加玩家加入事件处理
         socket.on('player_joined', (data) => {
+            console.log('Player joined event received:', data);
+            
             // 如果是当前玩家加入，保存玩家ID
-            if (playerId === null) {
-                playerId = data.player_id;
-                document.getElementById('your-player-number').textContent = data.player_id + 1;
+            if (myPlayerId === null) {
+                myPlayerId = data.player_id;
+                console.log(`Setting my player ID to ${myPlayerId}`);
+                document.getElementById('your-player-number').textContent = data.player_id;
             }
+            
+            // 更新已连接玩家显示
             updateConnectedPlayers(data.connected_players);
+            console.log(`Updated connected players: ${data.connected_players}`);
+            
+            // 更新房间人数显示
+            if (data.player_count !== undefined) {
+                console.log(`Updating room player count to ${data.player_count}`);
+                document.getElementById('player-count-display').textContent = data.player_count;
+            } else if (data.connected_players) {
+                // 如果没有提供player_count，则使用连接玩家数量
+                const count = data.connected_players.length;
+                console.log(`Setting room player count based on connected players: ${count}`);
+                document.getElementById('player-count-display').textContent = count;
+            }
             
             // 只有当所有玩家都加入后才开始游戏
             if (data.all_players_joined) {
+                console.log('All players joined, switching to game screen');
                 document.getElementById('role-screen').classList.add('hidden');
                 document.getElementById('game-screen').classList.remove('hidden');
             }
@@ -471,19 +1177,19 @@
             const container = document.getElementById('connected-players');
             container.innerHTML = '';
             
-            // 显示已连接玩家
+            // 显示已连接玩家 - 无需增加+1
             players.sort((a, b) => a - b).forEach(pid => {
                 const span = document.createElement('span');
                 span.className = 'connected-player';
-                span.textContent = `玩家${pid + 1}`;
+                span.textContent = `玩家${pid}`;
                 container.appendChild(span);
             });
         }
 
         // 用户操作函数
         function createGame() {
-            const playerCount = document.getElementById('player-count').value;
-            socket.emit('create_game', { player_count: playerCount });
+            console.log("Creating new game...");
+            socket.emit('create_game');
         }
 
         function submitTeam() {
@@ -499,7 +1205,7 @@
         function submitTeamVote(approve) {
             socket.emit('team_vote', {
                 game_id: gameId,
-                player_id: playerId + 1,  // 转换为显示用的ID
+                player_id: myPlayerId,
                 vote: approve
             });
             document.getElementById('team-vote').classList.add('hidden');
@@ -508,7 +1214,7 @@
         function submitQuestVote(success) {
             socket.emit('quest_vote', {
                 game_id: gameId,
-                player_id: playerId + 1,  // 转换为显示用的ID
+                player_id: myPlayerId,
                 vote: success
             });
         }
@@ -521,17 +1227,45 @@
         }
 
         function joinExistingGame() {
-            const inputGameId = document.getElementById('game-id-input').value.trim();
-            if (!inputGameId) {
-                alert('请输入游戏ID');
+            const gameIdInput = document.getElementById('game-id-input');
+            const gameId = gameIdInput.value.trim();
+            const joinButton = document.getElementById('join-button');
+            
+            // 清空任何存在的错误消息
+            clearErrorMessages();
+            
+            if (!gameId) {
+                showErrorMessage('游戏ID不能为空');
                 return;
             }
-            gameId = inputGameId;
             
-            // 验证游戏ID是否存在
-            socket.emit('validate_game', { game_id: gameId });
-            // 清空输入框
-            document.getElementById('game-id-input').value = '';
+            // 禁用按钮，显示加载状态
+            joinButton.disabled = true;
+            joinButton.textContent = '加入中...';
+            
+            // 清除任何现有的超时处理器
+            if (window.joinTimeoutId) {
+                console.log('Clearing existing timeout', window.joinTimeoutId);
+                clearTimeout(window.joinTimeoutId);
+            }
+            
+            // 设置超时处理 - 增加至20秒
+            window.joinTimeoutId = setTimeout(() => {
+                console.log('Join game timeout triggered after 20 seconds');
+                // 重置按钮状态
+                joinButton.disabled = false;
+                joinButton.textContent = '加入游戏';
+                // 显示超时错误信息
+                showErrorMessage('加入游戏超时，请检查网络连接并重试。如果问题持续存在，请尝试刷新页面。');
+                // 清除超时ID
+                window.joinTimeoutId = null;
+            }, 20000); // 20秒超时
+            
+            console.log(`Attempting to join game with ID: ${gameId}`);
+            
+            // 直接发送加入游戏请求
+            socket.emit('join_game', { game_id: gameId });
+            console.log(`Sent join_game request for game: ${gameId}`);
         }
 
         function copyGameId(id) {
@@ -546,6 +1280,135 @@
                 console.error('复制失败:', err);
                 alert('复制失败，请手动复制游戏ID');
             });
+        }
+
+        // 监听加入游戏成功事件
+        socket.on('joined_game', function(data) {
+            console.log('Joined game successfully:', data);
+            const gameId = data.game_id;
+            const playerId = data.player_id;
+            
+            // 清除任何超时处理器
+            if (window.joinTimeoutId) {
+                console.log('Clearing join timeout on successful join');
+                clearTimeout(window.joinTimeoutId);
+                window.joinTimeoutId = null;
+            }
+            
+            // 重置按钮状态
+            const joinButton = document.getElementById('join-button');
+            joinButton.disabled = false;
+            joinButton.textContent = '加入游戏';
+            
+            // 隐藏设置界面，显示角色界面
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('role-screen').classList.remove('hidden');
+            
+            // 显示游戏ID
+            const gameInfoDiv = document.querySelector('.game-info');
+            const gameIdSpan = document.getElementById('game-id');
+            
+            if (gameIdSpan && gameInfoDiv) {
+                gameIdSpan.textContent = gameId;
+                gameInfoDiv.style.display = 'block';
+                addFadeInAnimation(gameInfoDiv);
+            }
+            
+            // 显示玩家编号
+            if (playerId !== undefined) {
+                console.log(`Setting player number to ${playerId}`);
+                document.getElementById('your-player-number').textContent = playerId;
+            }
+            
+            // 保存玩家ID到全局变量
+            myPlayerId = playerId;
+            
+            // 设置房间人数显示（如果服务器提供了这个数据）
+            if (data.player_count !== undefined) {
+                console.log(`Setting room player count to ${data.player_count}`);
+                document.getElementById('player-count-display').textContent = data.player_count;
+            }
+            
+            // 如果服务器提供了已连接玩家列表，则更新显示
+            if (data.connected_players) {
+                updateConnectedPlayers(data.connected_players);
+            }
+            
+            // 添加淡入动画效果
+            const gameIdInfo = document.getElementById('game-id-info');
+            if (gameIdInfo) {
+                gameIdInfo.style.animation = 'fadeIn 1s';
+            }
+            
+            console.log('UI updated after joining game successfully');
+        });
+
+        // 游戏规则链接事件处理
+        document.getElementById('rules-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('阿瓦隆是一款隐藏身份的推理游戏。游戏中，玩家分为正义方（亚瑟王的忠臣）和邪恶方（莫德雷德的爪牙）。正义方需要完成3次任务才能获胜，而邪恶方需要使3次任务失败或者成功猜出谁是梅林才能获胜。每轮游戏中，队长选择队员去执行任务，所有玩家投票决定是否同意这个队伍。如果队伍得到批准，队员将秘密投票决定任务的成功或失败。');
+        });
+
+        // 显示错误消息的辅助函数
+        function showErrorMessage(message) {
+            // 检查是否已存在错误提示
+            let errorDiv = document.getElementById('error-message');
+            if (!errorDiv) {
+                errorDiv = document.createElement('div');
+                errorDiv.id = 'error-message';
+                errorDiv.style.position = 'fixed';
+                errorDiv.style.top = '20px';
+                errorDiv.style.left = '50%';
+                errorDiv.style.transform = 'translateX(-50%)';
+                errorDiv.style.backgroundColor = 'rgba(220, 53, 69, 0.9)';
+                errorDiv.style.color = 'white';
+                errorDiv.style.padding = '15px 25px';
+                errorDiv.style.borderRadius = '5px';
+                errorDiv.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                errorDiv.style.zIndex = '9999';
+                errorDiv.style.maxWidth = '80%';
+                errorDiv.style.textAlign = 'center';
+                errorDiv.style.fontWeight = 'bold';
+                document.body.appendChild(errorDiv);
+            }
+            
+            // 显示错误消息
+            errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+            
+            // 添加淡入效果
+            errorDiv.style.animation = 'fadeIn 0.3s';
+            
+            // 3秒后自动关闭
+            setTimeout(() => {
+                errorDiv.style.animation = 'fadeOut 0.3s forwards';
+                setTimeout(() => {
+                    if (errorDiv.parentNode) {
+                        errorDiv.parentNode.removeChild(errorDiv);
+                    }
+                }, 300);
+            }, 3000);
+            
+            // 添加关闭按钮
+            const closeButton = document.createElement('span');
+            closeButton.innerHTML = '&times;';
+            closeButton.style.marginLeft = '10px';
+            closeButton.style.cursor = 'pointer';
+            closeButton.style.fontSize = '20px';
+            closeButton.style.verticalAlign = 'middle';
+            closeButton.onclick = function() {
+                if (errorDiv.parentNode) {
+                    errorDiv.parentNode.removeChild(errorDiv);
+                }
+            };
+            errorDiv.appendChild(closeButton);
+        }
+        
+        // 清除错误消息的辅助函数
+        function clearErrorMessages() {
+            const errorDiv = document.getElementById('error-message');
+            if (errorDiv && errorDiv.parentNode) {
+                errorDiv.parentNode.removeChild(errorDiv);
+            }
         }
     </script>
 </body>
