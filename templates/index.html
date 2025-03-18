@@ -708,6 +708,49 @@
         .footer-links i {
             margin-right: 5px;
         }
+
+        /* 角色说明样式 */
+        .role-explanation {
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin: 25px 0;
+            box-shadow: var(--box-shadow);
+            border: 1px solid #e0e0e0;
+        }
+        
+        .role-explanation h3 {
+            color: var(--primary-color);
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .role-explanation h4 {
+            color: var(--secondary-color);
+            margin: 15px 0 10px;
+            font-size: 1.2rem;
+            text-align: left;
+        }
+        
+        .role-explanation-content {
+            padding: 10px;
+        }
+        
+        .role-explanation ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .role-explanation li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .role-explanation p {
+            margin: 5px 0;
+            line-height: 1.5;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 </head>
@@ -750,11 +793,39 @@
                 <p><i class="fas fa-user-friends"></i> 房间人数: <span id="player-count-display"></span> 人</p>
                 <p><i class="fas fa-user-check"></i> 已加入玩家: <span id="connected-players"></span></p>
                 <p><i class="fas fa-id-badge"></i> 你的编号: <span id="your-player-number"></span></p>
+                <button id="start-game-btn" onclick="startGame()" class="success"><i class="fas fa-play"></i> 开始游戏</button>
+                <p id="min-players-msg" class="hidden" style="color: #e74c3c; margin-top: 10px;"><i class="fas fa-exclamation-circle"></i> 至少需要5名玩家才能开始游戏</p>
             </div>
             <div id="role-info" class="role-info hidden">
                 <h3><i class="fas fa-chess-knight"></i> 你的角色信息</h3>
                 <p id="role-name"></p>
                 <p id="role-special-info"></p>
+            </div>
+            <div class="role-explanation">
+                <h3><i class="fas fa-book"></i> 角色说明</h3>
+                <div class="role-explanation-content">
+                    <h4>正义方</h4>
+                    <ul>
+                        <li><strong>梅林：</strong>知道所有邪恶方（除莫德雷德外）的身份，但不能透露自己的身份，否则会被刺客刺杀。</li>
+                        <li><strong>派西维尔：</strong>知道谁是梅林，但无法区分梅林和莫甘娜。</li>
+                        <li><strong>忠臣：</strong>不知道任何玩家的身份，忠于亚瑟王。</li>
+                    </ul>
+                    <h4>邪恶方</h4>
+                    <ul>
+                        <li><strong>莫德雷德：</strong>邪恶方首领，不被梅林看到，知道其他邪恶方身份。</li>
+                        <li><strong>莫甘娜：</strong>会干扰派西维尔的能力，知道其他邪恶方身份。</li>
+                        <li><strong>刺客：</strong>游戏结束时有机会刺杀梅林，知道其他邪恶方身份。</li>
+                        <li><strong>奥伯伦：</strong>独行侠，不被其他邪恶方认出，也不知道其他邪恶方身份。</li>
+                        <li><strong>爪牙：</strong>服务于邪恶首领，知道其他邪恶方身份。</li>
+                    </ul>
+                    <h4>游戏配置</h4>
+                    <p>5人局：梅林、派西维尔、忠臣、莫甘娜、刺客</p>
+                    <p>6人局：梅林、派西维尔、忠臣×2、莫甘娜、刺客</p>
+                    <p>7人局：梅林、派西维尔、忠臣×2、莫甘娜、刺客、奥伯伦</p>
+                    <p>8人局：梅林、派西维尔、忠臣×3、莫甘娜、刺客、爪牙</p>
+                    <p>9人局：梅林、派西维尔、忠臣×4、莫甘娜、刺客、莫德雷德</p>
+                    <p>10人局：梅林、派西维尔、忠臣×4、莫甘娜、刺客、莫德雷德、奥伯伦</p>
+                </div>
             </div>
         </div>
 
@@ -886,6 +957,9 @@
             console.log('Connected to server');
             myPlayerId = socket.id.substr(0, 4);
             console.log('My Player ID:', myPlayerId);
+            
+            // 初始化开始游戏按钮
+            setTimeout(updateStartGameButton, 500);
         });
 
         // 监听错误事件
@@ -999,6 +1073,35 @@
                             li.innerHTML = `玩家${data.evil_players[i]} - ${data.evil_roles ? data.evil_roles[i] : '未知'}`;
                             evilPlayersList.appendChild(li);
                         }
+                    }
+                    
+                    // 使用classList切换hidden类
+                    evilPlayersInfo.classList.remove('hidden');
+                    addFadeInAnimation(evilPlayersInfo);
+                }
+            } else if (data.merlin_morgana) {
+                // 派西维尔特殊信息
+                let specialInfo = '你看到的梅林和莫甘娜（无法区分）：<ul>';
+                for (let i = 0; i < data.merlin_morgana.length; i++) {
+                    const player = data.merlin_morgana[i];
+                    specialInfo += `<li>玩家${player} - 梅林或莫甘娜</li>`;
+                }
+                specialInfo += '</ul>';
+                roleSpecialInfo.innerHTML = specialInfo;
+                
+                // 也更新页面上的特殊信息显示
+                const evilInfoTitle = document.getElementById('evil-info-title');
+                const evilPlayersList = document.getElementById('evil-players-list');
+                const evilPlayersInfo = document.querySelector('.evil-players-info');
+                
+                if (evilInfoTitle && evilPlayersList && evilPlayersInfo) {
+                    evilInfoTitle.textContent = '派西维尔看到的梅林和莫甘娜';
+                    
+                    evilPlayersList.innerHTML = '';
+                    for (let i = 0; i < data.merlin_morgana.length; i++) {
+                        const li = document.createElement('li');
+                        li.innerHTML = `玩家${data.merlin_morgana[i]} - 梅林或莫甘娜`;
+                        evilPlayersList.appendChild(li);
                     }
                     
                     // 使用classList切换hidden类
@@ -1186,6 +1289,9 @@
                 document.getElementById('player-count-display').textContent = count;
             }
             
+            // 更新开始游戏按钮状态
+            updateStartGameButton();
+            
             // 只有当所有玩家都加入后才开始游戏
             if (data.all_players_joined) {
                 console.log('All players joined, switching to game screen');
@@ -1211,6 +1317,9 @@
                 span.textContent = `玩家${pid}`;
                 container.appendChild(span);
             });
+            
+            // 更新开始游戏按钮状态
+            updateStartGameButton();
         }
 
         // 用户操作函数
@@ -1435,6 +1544,33 @@
             const errorDiv = document.getElementById('error-message');
             if (errorDiv && errorDiv.parentNode) {
                 errorDiv.parentNode.removeChild(errorDiv);
+            }
+        }
+
+        function startGame() {
+            const playerCount = parseInt(document.getElementById('player-count-display').textContent);
+            if (playerCount < 5) {
+                // 显示最小人数提示
+                document.getElementById('min-players-msg').classList.remove('hidden');
+                return;
+            }
+            
+            console.log(`正在开始游戏，房间ID: ${gameId}`);
+            socket.emit('start_game_manual', { game_id: gameId });
+        }
+
+        // 当玩家数变化时检查是否可以显示开始游戏按钮
+        function updateStartGameButton() {
+            const playerCount = parseInt(document.getElementById('player-count-display').textContent || "0");
+            const startButton = document.getElementById('start-game-btn');
+            const minPlayersMsg = document.getElementById('min-players-msg');
+            
+            if (playerCount >= 5) {
+                startButton.disabled = false;
+                minPlayersMsg.classList.add('hidden');
+            } else {
+                startButton.disabled = true;
+                minPlayersMsg.classList.remove('hidden');
             }
         }
     </script>

@@ -420,13 +420,52 @@ def error_handler(e):
     logger.error(f"SocketIO error: {str(e)}")
     emit('error', {'message': '发生错误，请重试'})
 
+@socketio.on('start_game_manual')
+def handle_start_game_manual(data):
+    """处理手动开始游戏的请求"""
+    game_id = data.get('game_id')
+    
+    if not game_id:
+        emit('error', {'message': '游戏ID不能为空'})
+        return False
+    
+    # 确保game_id是字符串类型
+    game_id = str(game_id)
+    
+    if game_id not in rooms:
+        emit('error', {'message': '游戏ID不存在'})
+        return False
+    
+    # 检查游戏是否已经开始
+    if rooms[game_id]['started']:
+        emit('error', {'message': '游戏已经开始'})
+        return False
+    
+    # 检查玩家数量
+    player_count = len(rooms[game_id]['players'])
+    if player_count < 5:
+        emit('error', {'message': '至少需要5名玩家才能开始游戏'})
+        return False
+    
+    if player_count > 10:
+        emit('error', {'message': '最多支持10名玩家'})
+        return False
+    
+    # 开始游戏
+    logger.debug(f"Manually starting game in room {game_id} with {player_count} players")
+    start_game(game_id)
+    return True
+
 def start_game(room):
     """开始游戏"""
     logger.debug(f"Starting game in room {room}")
     rooms[room]['started'] = True
     
+    # 获取玩家数量
+    player_count = len(rooms[room]['players'])
+    
     # 创建游戏实例
-    game = AvalonGame(5)  # 5个玩家
+    game = AvalonGame(player_count)  # 传入实际玩家数量
     games[room] = game
     game.assign_roles()
     
@@ -444,12 +483,21 @@ def start_game(room):
         
         if role == '梅林':
             evil_players = [j for j, (_, r) in enumerate(game.players)
-                        if r in ["刺客", "爪牙"]]
+                        if r in ["刺客", "爪牙", "莫甘娜", "莫德雷德"] and r != "莫德雷德"]
             role_info['evil_players'] = [p + 1 for p in evil_players]
             role_info['evil_roles'] = [game.players[p][1] for p in evil_players]
-        elif role in ["刺客", "爪牙"]:
+        elif role == '派西维尔':
+            # 派西维尔可以看到梅林和莫甘娜，但无法区分
+            merlin_morgana = []
+            for j, (_, r) in enumerate(game.players):
+                if r in ['梅林', '莫甘娜']:
+                    merlin_morgana.append(j)
+            role_info['merlin_morgana'] = [p + 1 for p in merlin_morgana]
+            role_info['merlin_morgana_roles'] = ["梅林或莫甘娜"] * len(merlin_morgana)
+        elif role in ["刺客", "爪牙", "莫甘娜", "莫德雷德"]:
+            # 邪恶方互相认识，除了奥伯伦
             evil_players = [j for j, (_, r) in enumerate(game.players)
-                        if r in ["刺客", "爪牙"]]
+                        if r in ["刺客", "爪牙", "莫甘娜", "莫德雷德"] and j != player_index and r != "奥伯伦"]
             role_info['evil_players'] = [p + 1 for p in evil_players]
             role_info['evil_roles'] = [game.players[p][1] for p in evil_players]
         
