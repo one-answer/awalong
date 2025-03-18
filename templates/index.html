@@ -935,11 +935,66 @@
             }
         });
 
-        // 当游戏开始时，可以隐藏等待消息
-        socket.on('game_started', function() {
+        // 当游戏开始时，切换到游戏界面
+        socket.on('game_started', function(data) {
+            console.log('Game started event received:', data);
+            
+            // 隐藏等待消息
             const waitingMessage = document.getElementById('waiting-message');
             if (waitingMessage) {
                 waitingMessage.style.display = 'none';
+            }
+            
+            // 隐藏角色等待界面，显示游戏主界面
+            document.getElementById('role-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            
+            // 显示队长信息
+            const leaderInfo = document.createElement('div');
+            leaderInfo.className = 'alert-message';
+            leaderInfo.innerHTML = `<i class="fas fa-crown"></i> 游戏已开始！玩家${data.leader}是第一位队长`;
+            leaderInfo.style.position = 'fixed';
+            leaderInfo.style.top = '20px';
+            leaderInfo.style.left = '50%';
+            leaderInfo.style.transform = 'translateX(-50%)';
+            leaderInfo.style.backgroundColor = 'rgba(52, 152, 219, 0.9)';
+            leaderInfo.style.color = 'white';
+            leaderInfo.style.padding = '15px 25px';
+            leaderInfo.style.borderRadius = '5px';
+            leaderInfo.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+            leaderInfo.style.zIndex = '9999';
+            leaderInfo.style.maxWidth = '80%';
+            leaderInfo.style.textAlign = 'center';
+            leaderInfo.style.fontWeight = 'bold';
+            document.body.appendChild(leaderInfo);
+            
+            // 3秒后自动关闭
+            setTimeout(() => {
+                leaderInfo.style.animation = 'fadeOut 0.3s forwards';
+                setTimeout(() => {
+                    if (leaderInfo.parentNode) {
+                        leaderInfo.parentNode.removeChild(leaderInfo);
+                    }
+                }, 300);
+            }, 5000);
+            
+            // 如果当前玩家是队长，显示队员选择界面
+            if (myPlayerId == data.leader) {
+                document.getElementById('team-selection').classList.remove('hidden');
+                
+                // 生成队员选择按钮
+                const teamSelectionButtons = document.getElementById('team-selection-buttons');
+                teamSelectionButtons.innerHTML = '';
+                for (let i = 1; i <= data.player_count; i++) {
+                    const label = document.createElement('label');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.value = i;
+                    
+                    label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode(`玩家${i}`));
+                    teamSelectionButtons.appendChild(label);
+                }
             }
         });
 
@@ -1115,6 +1170,11 @@
 
         socket.on('game_state', (data) => {
             console.log('Game state:', data);
+            
+            // 当收到游戏状态时，确保切换到游戏界面
+            document.getElementById('role-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            
             document.getElementById('game-player-number').textContent = myPlayerId;
             document.getElementById('game-player-role').textContent = playerRole;
             document.getElementById('current-quest').textContent = data.current_quest;
@@ -1147,7 +1207,7 @@
             }
             
             // 隐藏选择队员的UI，除非当前玩家是队长
-            const isLeader = myPlayerId === data.leader;
+            const isLeader = myPlayerId == data.leader;
             document.getElementById('team-selection').className = isLeader ? '' : 'hidden';
             
             // 生成队员选择按钮
@@ -1187,14 +1247,19 @@
             // 显示投票结果
             const voteResults = Object.entries(data.votes)
                 .sort((a, b) => parseInt(a[0]) - parseInt(b[0]))  // 按玩家编号排序
-                .map(([pid, vote]) => `玩家${parseInt(pid)}: ${vote ? '同意' : '反对'}`)
+                .map(([pid, vote]) => `玩家${parseInt(pid)+1}: ${vote ? '同意' : '反对'}`)
                 .join(', ');
             alert(`投票结果：${voteResults}`);
             
             if (data.success) {
                 // 检查当前玩家是否在任务队员中
-                if (data.team.includes(myPlayerId)) {
+                console.log("当前玩家ID:", myPlayerId);
+                console.log("任务队员:", data.team);
+                console.log("检查玩家是否在团队中:", data.team.includes(parseInt(myPlayerId)));
+                
+                if (data.team.includes(parseInt(myPlayerId))) {
                     document.getElementById('quest-vote').classList.remove('hidden');
+                    console.log("显示任务投票按钮");
                 }
                 // 显示被选中的队员
                 const questInfo = document.createElement('p');
@@ -1330,35 +1395,65 @@
 
         function submitTeam() {
             const checkboxes = document.querySelectorAll('#team-selection-buttons input:checked');
-            if (checkboxes.length !== parseInt(document.getElementById('required-players').textContent)) {
-                alert('请选择正确数量的队员');
+            const requiredPlayers = parseInt(document.getElementById('required-players').textContent);
+            
+            if (checkboxes.length !== requiredPlayers) {
+                alert(`请选择${requiredPlayers}名队员`);
                 return;
             }
+            
+            // 使用正确的gameId变量（从window对象中获取，或使用全局变量）
+            const currentGameId = window.gameId || gameId;
+            
             const team = Array.from(checkboxes).map(cb => parseInt(cb.value));
-            socket.emit('propose_team', { game_id: gameId, team: team });
+            console.log(`提交队伍: ${team.join(', ')} 到游戏 ${currentGameId}`);
+            socket.emit('propose_team', { game_id: currentGameId, team: team });
         }
 
         function submitTeamVote(approve) {
+            // 使用正确的gameId变量
+            const currentGameId = window.gameId || gameId;
+            
+            // 确保玩家ID是整数
+            const playerId = parseInt(myPlayerId);
+            console.log(`提交团队投票: ${approve ? '同意' : '反对'}, 玩家ID: ${playerId}`);
+            
             socket.emit('team_vote', {
-                game_id: gameId,
-                player_id: myPlayerId,
+                game_id: currentGameId,
+                player_id: playerId,
                 vote: approve
             });
             document.getElementById('team-vote').classList.add('hidden');
         }
 
         function submitQuestVote(success) {
+            // 使用正确的gameId变量
+            const currentGameId = window.gameId || gameId;
+            
+            // 确保玩家ID是整数
+            const playerId = parseInt(myPlayerId);
+            console.log(`提交任务投票: ${success ? '成功' : '失败'}, 玩家ID: ${playerId}`);
+            
             socket.emit('quest_vote', {
-                game_id: gameId,
-                player_id: myPlayerId,
+                game_id: currentGameId,
+                player_id: playerId,
                 vote: success
             });
+            // 隐藏投票按钮，防止重复投票
+            document.getElementById('quest-vote').classList.add('hidden');
         }
 
         function assassinate(target) {
+            // 使用正确的gameId变量
+            const currentGameId = window.gameId || gameId;
+            
+            // 确保目标ID是整数
+            const targetId = parseInt(target);
+            console.log(`执行刺杀: 目标玩家${targetId}`);
+            
             socket.emit('assassinate', {
-                game_id: gameId,
-                target: target
+                game_id: currentGameId,
+                target: targetId
             });
         }
 
@@ -1452,127 +1547,89 @@
             
             // 显示玩家编号
             if (playerId !== undefined) {
-                console.log(`Setting player number to ${playerId}`);
+                console.log(`玩家ID已设置: ${playerId}`);
                 document.getElementById('your-player-number').textContent = playerId;
+                myPlayerId = playerId;
             }
-            
-            // 保存玩家ID到全局变量
-            myPlayerId = playerId;
-            
-            // 设置房间人数显示（如果服务器提供了这个数据）
-            if (data.player_count !== undefined) {
-                console.log(`Setting room player count to ${data.player_count}`);
-                document.getElementById('player-count-display').textContent = data.player_count;
-            }
-            
-            // 如果服务器提供了已连接玩家列表，则更新显示
-            if (data.connected_players) {
-                updateConnectedPlayers(data.connected_players);
-            }
-            
-            // 添加淡入动画效果
-            const gameIdInfo = document.getElementById('game-id-info');
-            if (gameIdInfo) {
-                gameIdInfo.style.animation = 'fadeIn 1s';
-            }
-            
-            console.log('UI updated after joining game successfully');
         });
 
-        // 游戏规则链接事件处理
-        document.getElementById('rules-link').addEventListener('click', function(e) {
-            e.preventDefault();
-            alert('阿瓦隆是一款隐藏身份的推理游戏。游戏中，玩家分为正义方（亚瑟王的忠臣）和邪恶方（莫德雷德的爪牙）。正义方需要完成3次任务才能获胜，而邪恶方需要使3次任务失败或者成功猜出谁是梅林才能获胜。每轮游戏中，队长选择队员去执行任务，所有玩家投票决定是否同意这个队伍。如果队伍得到批准，队员将秘密投票决定任务的成功或失败。');
-        });
-
-        // 显示错误消息的辅助函数
+        // 显示错误消息的函数
         function showErrorMessage(message) {
-            // 检查是否已存在错误提示
-            let errorDiv = document.getElementById('error-message');
-            if (!errorDiv) {
-                errorDiv = document.createElement('div');
-                errorDiv.id = 'error-message';
-                errorDiv.style.position = 'fixed';
-                errorDiv.style.top = '20px';
-                errorDiv.style.left = '50%';
-                errorDiv.style.transform = 'translateX(-50%)';
-                errorDiv.style.backgroundColor = 'rgba(220, 53, 69, 0.9)';
-                errorDiv.style.color = 'white';
-                errorDiv.style.padding = '15px 25px';
-                errorDiv.style.borderRadius = '5px';
-                errorDiv.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
-                errorDiv.style.zIndex = '9999';
-                errorDiv.style.maxWidth = '80%';
-                errorDiv.style.textAlign = 'center';
-                errorDiv.style.fontWeight = 'bold';
-                document.body.appendChild(errorDiv);
+            // 创建错误消息元素
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'error-message';
+            errorMsg.textContent = message;
+            errorMsg.style.backgroundColor = 'rgba(231, 76, 60, 0.9)';
+            errorMsg.style.color = 'white';
+            errorMsg.style.padding = '10px 20px';
+            errorMsg.style.borderRadius = '5px';
+            errorMsg.style.marginTop = '10px';
+            errorMsg.style.fontWeight = 'bold';
+            errorMsg.style.textAlign = 'center';
+            errorMsg.style.animation = 'fadeIn 0.3s';
+            
+            // 添加到适当的容器
+            const container = document.querySelector('.container');
+            // 检查是否已有错误消息
+            const existingError = document.querySelector('.error-message');
+            if (existingError) {
+                existingError.remove();
             }
+            container.insertBefore(errorMsg, container.firstChild);
             
-            // 显示错误消息
-            errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
-            
-            // 添加淡入效果
-            errorDiv.style.animation = 'fadeIn 0.3s';
-            
-            // 3秒后自动关闭
+            // 自动关闭
             setTimeout(() => {
-                errorDiv.style.animation = 'fadeOut 0.3s forwards';
+                errorMsg.style.animation = 'fadeOut 0.3s forwards';
                 setTimeout(() => {
-                    if (errorDiv.parentNode) {
-                        errorDiv.parentNode.removeChild(errorDiv);
+                    if (errorMsg.parentNode) {
+                        errorMsg.parentNode.removeChild(errorMsg);
                     }
                 }, 300);
-            }, 3000);
-            
-            // 添加关闭按钮
-            const closeButton = document.createElement('span');
-            closeButton.innerHTML = '&times;';
-            closeButton.style.marginLeft = '10px';
-            closeButton.style.cursor = 'pointer';
-            closeButton.style.fontSize = '20px';
-            closeButton.style.verticalAlign = 'middle';
-            closeButton.onclick = function() {
-                if (errorDiv.parentNode) {
-                    errorDiv.parentNode.removeChild(errorDiv);
-                }
-            };
-            errorDiv.appendChild(closeButton);
+            }, 5000);
         }
         
-        // 清除错误消息的辅助函数
+        // 清除错误消息
         function clearErrorMessages() {
-            const errorDiv = document.getElementById('error-message');
-            if (errorDiv && errorDiv.parentNode) {
-                errorDiv.parentNode.removeChild(errorDiv);
-            }
+            const errorMsgs = document.querySelectorAll('.error-message');
+            errorMsgs.forEach(msg => {
+                msg.style.animation = 'fadeOut 0.3s forwards';
+                setTimeout(() => {
+                    if (msg.parentNode) {
+                        msg.parentNode.removeChild(msg);
+                    }
+                }, 300);
+            });
         }
 
-        function startGame() {
-            const playerCount = parseInt(document.getElementById('player-count-display').textContent);
-            if (playerCount < 5) {
-                // 显示最小人数提示
-                document.getElementById('min-players-msg').classList.remove('hidden');
-                return;
-            }
-            
-            console.log(`正在开始游戏，房间ID: ${gameId}`);
-            socket.emit('start_game_manual', { game_id: gameId });
-        }
-
-        // 当玩家数变化时检查是否可以显示开始游戏按钮
+        // 更新开始游戏按钮状态
         function updateStartGameButton() {
-            const playerCount = parseInt(document.getElementById('player-count-display').textContent || "0");
+            const connectedPlayers = document.querySelectorAll('.connected-player');
             const startButton = document.getElementById('start-game-btn');
             const minPlayersMsg = document.getElementById('min-players-msg');
             
-            if (playerCount >= 5) {
-                startButton.disabled = false;
-                minPlayersMsg.classList.add('hidden');
-            } else {
+            if (connectedPlayers.length < 5) {
                 startButton.disabled = true;
+                startButton.classList.add('disabled');
                 minPlayersMsg.classList.remove('hidden');
+            } else {
+                startButton.disabled = false;
+                startButton.classList.remove('disabled');
+                minPlayersMsg.classList.add('hidden');
             }
         }
+
+        // 开始游戏
+        function startGame() {
+            console.log("Starting game...");
+            const currentGameId = window.gameId || gameId;
+            socket.emit('start_game_manual', { game_id: currentGameId });
+        }
+        
+        // 确保window加载完成后初始化操作
+        window.onload = function() {
+            // 初始化UI组件
+            updateStartGameButton();
+        };
     </script>
 </body>
-</html> 
+</html>

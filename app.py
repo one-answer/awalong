@@ -526,6 +526,12 @@ def start_game(room):
         }, broadcast=True)
     else:
         emit_game_state(room)
+    
+    # 发送游戏开始事件，通知前端切换界面
+    socketio.emit('game_started', {
+        'leader': game.leader_index + 1,
+        'player_count': game.player_count
+    }, room=room)
 
 if __name__ == '__main__':
     # 修改运行配置，允许外部访问
