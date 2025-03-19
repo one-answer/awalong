@@ -539,6 +539,8 @@ def start_game(room):
             }, broadcast=True)
         else:
             # 在生产环境中使用房间
+            # 添加玩家编号到角色信息中
+            role_info['player_number'] = player['number']
             socketio.emit('role_info', role_info, room=player['sid'])
     
     logger.debug("All roles assigned, sending game state...")

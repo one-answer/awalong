@@ -1259,7 +1259,7 @@
             <div id="game-info" class="game-card">
                 <div class="player-info">
                     <h3><i class="fas fa-user-circle"></i> 玩家信息</h3>
-                    <p><i class="fas fa-hashtag"></i> 你的编号：玩家<span id="game-player-number"></span></p>
+                    <p><i class="fas fa-hashtag"></i> 你的编号：<span id="game-player-number"></span></p>
                     <p><i class="fas fa-mask"></i> 你的角色：<span id="game-player-role"></span></p>
                 </div>
                 <hr class="styled-hr">
@@ -1512,6 +1512,16 @@
             console.log('Game created:', data);
             gameId = data.game_id;
             
+            // 设置玩家编号
+            myPlayerId = data.player_id;
+            console.log(`设置玩家编号: ${myPlayerId}`);
+            
+            // 确保游戏主界面中的编号也被更新
+            const gamePlayerNumber = document.getElementById('game-player-number');
+            if (gamePlayerNumber) {
+                gamePlayerNumber.textContent = myPlayerId;
+            }
+            
             // 标记当前用户为房主
             isHost = true;
             console.log('You are the host of this game.');
@@ -1554,6 +1564,13 @@
             // 保存游戏信息
             gameId = data.game_id;
             myPlayerId = data.player_id;
+            console.log(`设置玩家编号: ${myPlayerId}`);
+            
+            // 确保游戏主界面中的编号也被更新
+            const gamePlayerNumber = document.getElementById('game-player-number');
+            if (gamePlayerNumber) {
+                gamePlayerNumber.textContent = myPlayerId;
+            }
             
             // 设置为非房主
             isHost = false;
@@ -1673,6 +1690,18 @@
                 }
             } else {
                 roleSpecialInfo.textContent = '没有特殊信息。';
+            }
+
+            // 设置玩家编号（如果服务器提供）
+            if (data.player_number) {
+                myPlayerId = data.player_number;
+                console.log(`从角色信息中设置玩家编号: ${myPlayerId}`);
+                
+                // 确保游戏主界面中的编号也被更新
+                const gamePlayerNumber = document.getElementById('game-player-number');
+                if (gamePlayerNumber) {
+                    gamePlayerNumber.textContent = myPlayerId;
+                }
             }
         });
 
