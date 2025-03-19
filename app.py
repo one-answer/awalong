@@ -170,11 +170,6 @@ def handle_join_game(data):
                 'player_count': len(rooms[room]['players'])
             }, room=room)
             
-            # 如果达到5个玩家，开始游戏
-            if len(rooms[room]['players']) == 5:
-                logger.debug(f"Room {room} has 5 players, starting game")
-                start_game(room)
-            
             return True
             
         except Exception as e:
