@@ -1205,14 +1205,26 @@
                 <p><i class="fas fa-user-friends"></i> 房间人数: <span id="player-count-display"></span> 人</p>
                 <p><i class="fas fa-user-check"></i> 已加入玩家: <span id="connected-players"></span></p>
                 <p><i class="fas fa-id-badge"></i> 你的编号: <span id="your-player-number"></span></p>
+                <div id="host-info" class="hidden" style="margin-bottom: 10px; color: #3498db;">
+                    <i class="fas fa-crown"></i> 你是房主，可以开始游戏
+                </div>
                 <button id="start-game-btn" onclick="startGame()" class="success"><i class="fas fa-play"></i> 开始游戏</button>
                 <p id="min-players-msg" class="hidden" style="color: #e74c3c; margin-top: 10px;"><i class="fas fa-exclamation-circle"></i> 至少需要5名玩家才能开始游戏</p>
             </div>
+
+            <!-- 游戏ID显示区域 - 移到前面且默认显示 -->
+            <div class="game-info" style="margin: 20px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-left: 5px solid #e67e22; text-align: center;">
+                <h3 style="color: #e67e22; font-size: 1.4rem; margin-bottom: 15px;"><i class="fas fa-gamepad"></i> 游戏ID: <span id="game-id" style="font-size: 2rem; letter-spacing: 4px; font-weight: bold; color: #2c3e50; display: inline-block; padding: 8px 15px; background-color: #f1f1f1; border-radius: 5px; margin-left: 10px;"></span></h3>
+                <p id="waiting-message" style="margin-top: 15px; color: #7f8c8d;"><i class="fas fa-hourglass-half"></i> 等待其他玩家加入...</p>
+                <button onclick="copyGameId(document.getElementById('game-id').textContent)" class="copy-button" style="margin-top: 10px; background-color: #f39c12;"><i class="fas fa-copy"></i> 复制游戏ID</button>
+            </div>
+            
             <div id="role-info" class="role-info hidden">
                 <h3><i class="fas fa-chess-knight"></i> 你的角色信息</h3>
                 <p id="role-name"></p>
                 <p id="role-special-info"></p>
             </div>
+            
             <div class="role-explanation">
                 <h3><i class="fas fa-book"></i> 角色说明</h3>
                 <div class="role-explanation-content">
@@ -1284,20 +1296,6 @@
                 <p>请选择要刺杀的目标：</p>
                 <div id="assassin-targets"></div>
             </div>
-        </div>
-
-        <!-- 游戏ID显示区域 -->
-        <div class="game-info" style="display: none;">
-            <h3><i class="fas fa-gamepad"></i> 游戏ID: <span id="game-id"></span></h3>
-            <p id="waiting-message"><i class="fas fa-hourglass-half"></i> 等待其他玩家加入...</p>
-        </div>
-
-        <!-- 玩家角色信息 - 初始隐藏 -->
-        <div class="player-info hidden">
-            <h2>你的角色信息</h2>
-            <p id="player-name"></p>
-            <p id="player-role"></p>
-            <p id="player-camp"></p>
         </div>
 
         <!-- 添加邪恶方信息显示区域 - 初始隐藏 -->
@@ -1512,41 +1510,86 @@
 
         socket.on('game_created', (data) => {
             console.log('Game created:', data);
-            const gameId = data.game_id;
+            gameId = data.game_id;
             
-            // 保存游戏ID到全局变量
-            window.gameId = gameId;
+            // 标记当前用户为房主
+            isHost = true;
+            console.log('You are the host of this game.');
             
-            // 显示游戏ID
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('role-screen').classList.remove('hidden');
+            
+            // 更新游戏ID和复制按钮
+            const gameIdDisplay = document.getElementById('game-id');
+            gameIdDisplay.textContent = gameId;
+            
+            // 显示游戏ID区域
             const gameInfoDiv = document.querySelector('.game-info');
-            const gameIdSpan = document.getElementById('game-id');
+            if (gameInfoDiv) {
+                addFadeInAnimation(gameInfoDiv);
+            }
             
-            if (gameIdSpan && gameInfoDiv) {
-                gameIdSpan.textContent = gameId;
-                gameInfoDiv.style.display = 'block';
-            }
+            // 显示玩家信息
+            document.getElementById('your-player-number').textContent = data.player_id;
+            
+            // 初始玩家计数
+            document.getElementById('player-count-display').textContent = data.player_count || 1;
+            updateConnectedPlayers(data.connected_players || [data.player_id]);
+            
+            // 更新开始游戏按钮状态
+            setTimeout(updateStartGameButton, 500);
+        });
 
-            // 更新玩家状态
-            if (data.player_id !== undefined) {
-                myPlayerId = data.player_id;
-                
-                // 设置玩家编号显示
-                document.getElementById('your-player-number').textContent = myPlayerId;
-                
-                // 隐藏设置界面，显示角色界面
-                document.getElementById('setup-screen').classList.add('hidden');
-                document.getElementById('role-screen').classList.remove('hidden');
-                
-                // 设置房间人数显示
-                document.getElementById('player-count-display').textContent = data.player_count;
-                
-                // 更新已连接玩家显示
-                if (data.connected_players) {
-                    updateConnectedPlayers(data.connected_players);
-                }
-                
-                console.log('Switched to role screen after creating game');
+        // 监听加入游戏成功事件
+        socket.on('joined_game', (data) => {
+            console.log('Successfully joined game:', data);
+            
+            // 清除超时处理
+            if (window.joinTimeoutId) {
+                console.log('Clearing join timeout on success');
+                clearTimeout(window.joinTimeoutId);
+                window.joinTimeoutId = null;
             }
+            
+            // 保存游戏信息
+            gameId = data.game_id;
+            myPlayerId = data.player_id;
+            
+            // 设置为非房主
+            isHost = false;
+            console.log('You joined a game as a regular player.');
+            
+            // 重置按钮状态
+            const joinButton = document.getElementById('join-button');
+            joinButton.disabled = false;
+            joinButton.textContent = '加入游戏';
+            
+            // 切换到角色界面
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('role-screen').classList.remove('hidden');
+            
+            // 显示玩家信息
+            document.getElementById('your-player-number').textContent = data.player_id;
+            
+            // 更新游戏ID显示
+            const gameIdDisplay = document.getElementById('game-id');
+            gameIdDisplay.textContent = gameId;
+            
+            // 显示游戏ID区域
+            const gameInfoDiv = document.querySelector('.game-info');
+            if (gameInfoDiv) {
+                addFadeInAnimation(gameInfoDiv);
+            }
+            
+            // 更新房间人数显示 - 确保即使在加入游戏成功后也能正确显示
+            document.getElementById('player-count-display').textContent = data.player_count;
+            console.log(`Setting player count display to: ${data.player_count}`);
+            
+            // 更新已连接玩家显示
+            updateConnectedPlayers(data.connected_players);
+            
+            // 更新开始游戏按钮状态
+            updateStartGameButton();
         });
 
         // 更新角色信息的处理
@@ -2009,48 +2052,6 @@
                 alert('复制失败，请手动复制游戏ID');
             });
         }
-
-        // 监听加入游戏成功事件
-        socket.on('joined_game', (data) => {
-            console.log('Successfully joined game:', data);
-            
-            // 清除超时处理
-            if (window.joinTimeoutId) {
-                console.log('Clearing join timeout on success');
-                clearTimeout(window.joinTimeoutId);
-                window.joinTimeoutId = null;
-            }
-            
-            // 保存游戏信息
-            gameId = data.game_id;
-            myPlayerId = data.player_id;
-            
-            // 设置为非房主
-            isHost = false;
-            console.log('You joined a game as a regular player.');
-            
-            // 重置按钮状态
-            const joinButton = document.getElementById('join-button');
-            joinButton.disabled = false;
-            joinButton.textContent = '加入游戏';
-            
-            // 切换到角色界面
-            document.getElementById('setup-screen').classList.add('hidden');
-            document.getElementById('role-screen').classList.remove('hidden');
-            
-            // 显示玩家信息
-            document.getElementById('your-player-number').textContent = data.player_id;
-            
-            // 更新房间人数显示 - 确保即使在加入游戏成功后也能正确显示
-            document.getElementById('player-count-display').textContent = data.player_count;
-            console.log(`Setting player count display to: ${data.player_count}`);
-            
-            // 更新已连接玩家显示
-            updateConnectedPlayers(data.connected_players);
-            
-            // 更新开始游戏按钮状态
-            updateStartGameButton();
-        });
 
         // 显示错误消息的函数
         function showErrorMessage(message) {
