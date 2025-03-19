@@ -349,6 +349,7 @@
             display: flex;
             flex-direction: column;
             padding: 10px 0;
+            justify-content: center;
         }
         
         .card-footer {
@@ -357,16 +358,31 @@
             justify-content: center;
         }
         
+        .create-game label, .join-game label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-color);
+            width: 100%;
+        }
+        
         .create-game select, .join-game input {
+            display: block;
+            width: 100%;
             margin-top: 10px;
             transition: all 0.3s;
             border: 1px solid #ddd;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 12px;
+            border-radius: var(--border-radius);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
         }
         
         .create-game select:focus, .join-game input:focus {
             border-color: var(--secondary-color);
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
         }
         
         /* 添加图标装饰 */
@@ -1170,7 +1186,9 @@
                     <div class="texture-overlay"></div>
                     <h3>加入游戏</h3>
                     <div class="card-content">
-                        <input type="text" id="game-id-input" placeholder="输入游戏ID">
+                        <label>游戏ID：
+                            <input type="text" id="game-id-input" placeholder="输入游戏ID">
+                        </label>
                     </div>
                     <div class="card-footer">
                         <button id="join-button" onclick="joinExistingGame()"><i class="fas fa-sign-in-alt"></i> 加入游戏</button>
